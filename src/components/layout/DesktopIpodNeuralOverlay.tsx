@@ -5,8 +5,8 @@ import { useTrackMoodProfile } from "@/hooks/useTrackMoodProfile";
 import { useIpodStore } from "@/stores/useIpodStore";
 import { useAppStore } from "@/stores/useAppStore";
 import { useDisplaySettingsStore } from "@/stores/useDisplaySettingsStore";
+import { useMusicVisualizerAppStore } from "@/stores/useMusicVisualizerAppStore";
 import { formatKugouImageUrl, getYouTubeVideoId } from "@/apps/ipod/constants";
-import { DisplayMode } from "@/types/lyrics";
 import {
   mostVividHexFromPalette,
   useCoverPaletteForNeural,
@@ -34,7 +34,7 @@ function blendHexTowardWhite(hex: string, t: number): string {
 }
 
 /**
- * Full-screen neural mood shader over the desktop wallpaper while iPod audio is playing.
+ * Full-screen mood shader over the desktop wallpaper while iPod audio is playing.
  * Sits above video/static wallpaper, below desktop icons (pointer-events: none).
  */
 export function DesktopIpodNeuralOverlay() {
@@ -45,6 +45,7 @@ export function DesktopIpodNeuralOverlay() {
   const totalTime = useIpodStore((s) => s.totalTime);
   const lyricLines = useIpodStore((s) => s.currentLyrics?.lines);
   const musicShadersOn = useDisplaySettingsStore((s) => s.musicShaderEffectsEnabled ?? true);
+  const visualizerMode = useMusicVisualizerAppStore((s) => s.mode);
 
   const track = useMemo(() => {
     if (!tracks.length) return null;
@@ -134,7 +135,7 @@ export function DesktopIpodNeuralOverlay() {
         aria-hidden
       >
         <MoodShaderVisualizer
-          mode={DisplayMode.VisualizerNeural}
+          mode={visualizerMode}
           mood={mood}
           isActive={isPlaying || lingerAfterPause}
           coverUrl={coverUrl}
