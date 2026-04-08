@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { loadWallpaperManifest } from "@/utils/wallpapers";
+import { useAudioReactiveStore } from "@/stores/useAudioReactiveStore";
+import { useAudioShaderSettingsStore } from "@/stores/useAudioShaderSettingsStore";
+import { useDisplaySettingsStore } from "@/stores/useDisplaySettingsStore";
 
 /** Duration each landscape video plays before crossfading to the next (ms) */
 const VIDEO_DURATION_MS = 30_000;
@@ -24,6 +27,15 @@ export function LandscapeVideoBackground({
   isActive,
   className = "",
 }: LandscapeVideoBackgroundProps) {
+  const musicShadersOn = useDisplaySettingsStore(
+    (s) => s.musicShaderEffectsEnabled ?? true
+  );
+  const eRaw = useAudioReactiveStore((s) => s.energy);
+  const bRaw = useAudioReactiveStore((s) => s.beat);
+  const motion = useAudioShaderSettingsStore((s) => s.visualMotion);
+  const react = musicShadersOn ? 1 : 0;
+  const audioEnergy = Math.min(1, eRaw * motion * react);
+  const beat = Math.min(1, bRaw * motion * react);
   const [videos, setVideos] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showB, setShowB] = useState(false);
@@ -155,6 +167,8 @@ export function LandscapeVideoBackground({
     return <div className={`bg-black ${className}`} />;
   }
 
+  const brightness = 0.92 + Math.min(1, audioEnergy) * 0.08 + Math.min(1, beat) * 0.06;
+
   return (
     <div className={`absolute inset-0 overflow-hidden ${className}`}>
       {/* Video A */}
@@ -182,7 +196,8 @@ export function LandscapeVideoBackground({
         className="absolute inset-0 w-full h-full object-cover"
         style={{
           opacity: showB ? 0 : 1,
-          transition: `opacity ${CROSSFADE_MS}ms ease-in-out`,
+          transition: `opacity ${CROSSFADE_MS}ms ease-in-out, filter 120ms ease-out`,
+          filter: `brightness(${brightness})`,
         }}
       />
 
@@ -212,7 +227,8 @@ export function LandscapeVideoBackground({
           className="absolute inset-0 w-full h-full object-cover"
           style={{
             opacity: showB ? 1 : 0,
-            transition: `opacity ${CROSSFADE_MS}ms ease-in-out`,
+            transition: `opacity ${CROSSFADE_MS}ms ease-in-out, filter 120ms ease-out`,
+            filter: `brightness(${brightness})`,
           }}
         />
       )}

@@ -1,7 +1,21 @@
 import React, { useRef, useEffect } from "react";
 import * as THREE from "three";
 import { useDisplaySettingsStore } from "@/stores/useDisplaySettingsStore";
+import { useAudioReactiveStore } from "@/stores/useAudioReactiveStore";
 import { ShaderType } from "@/types/shader";
+import { hexToRgb01 } from "@/utils/colorHex";
+
+/** Shared color grade for all desktop wallpaper shader variants. */
+const SHADER_GRADE_GLSL = `
+uniform vec3 uTint;
+uniform float uTintMix;
+uniform float uSaturation;
+vec3 gradeDesktopShaderRgb(vec3 c) {
+  vec3 tinted = mix(c, c * uTint, clamp(uTintMix, 0.0, 1.0));
+  float luma = dot(tinted, vec3(0.299, 0.587, 0.114));
+  return mix(vec3(luma), tinted, clamp(uSaturation, 0.0, 2.0));
+}
+`;
 
 // Re-export for backwards compatibility
 export { ShaderType };
@@ -74,6 +88,11 @@ const GalaxyBackground: React.FC<GalaxyBackgroundProps> = ({
         ),
       },
       time: { value: 0.0 },
+      beat: { value: 0.0 },
+      energy: { value: 0.0 },
+      uTint: { value: new THREE.Vector3(1, 1, 1) },
+      uTintMix: { value: 0.0 },
+      uSaturation: { value: 1.0 },
     };
 
     // Select shader based on type
@@ -83,6 +102,7 @@ const GalaxyBackground: React.FC<GalaxyBackgroundProps> = ({
           uniform vec2 resolution;
           uniform float time;
           varying vec2 vUv;
+          ${SHADER_GRADE_GLSL}
 
           void main() {
             vec4 O = vec4(0.0);
@@ -103,7 +123,9 @@ const GalaxyBackground: React.FC<GalaxyBackgroundProps> = ({
               * vec2(cos(x = m * .05 - f), sin(x))) - .5) + .02)
               * (1. + cos(m++ * .1 + length(a) * 6. - f + vec4(0, 1, 2, 0))));
 
-            gl_FragColor = O * 0.8; // Adjust brightness if needed
+            vec4 outc = O * 0.8;
+            outc.rgb = gradeDesktopShaderRgb(outc.rgb);
+            gl_FragColor = outc;
           }
         `;
         break;
@@ -113,6 +135,7 @@ const GalaxyBackground: React.FC<GalaxyBackgroundProps> = ({
           uniform vec2 resolution;
           uniform float time;
           varying vec2 vUv;
+          ${SHADER_GRADE_GLSL}
           
           // Simple hash function for noise approximation
           float hash(vec2 p) {
@@ -156,7 +179,83 @@ const GalaxyBackground: React.FC<GalaxyBackgroundProps> = ({
           void main() {
             vec4 fragColor = vec4(0.0);
             mainImage(fragColor, gl_FragCoord.xy);
-            gl_FragColor = fragColor * 0.4; // Dim slightly for performance
+            fragColor *= 0.4;
+            fragColor.rgb = gradeDesktopShaderRgb(fragColor.rgb);
+            gl_FragColor = fragColor;
+          }
+        `;
+        break;
+      case ShaderType.PINK_TRAIL_AURORA:
+        fragmentShader = `
+          uniform vec2 resolution;
+          uniform float time;
+          uniform float beat;
+          uniform float energy;
+          varying vec2 vUv;
+          ${SHADER_GRADE_GLSL}
+
+          float hash(float n) {
+            return fract(sin(n) * 43758.5453123);
+          }
+
+          float hash21(vec2 p) {
+            return fract(sin(dot(p, vec2(27.619, 57.583))) * 43758.5453);
+          }
+
+          float sparkleTrail(vec2 uv, float t, float strength) {
+            float total = 0.0;
+            for (int i = 0; i < 18; i++) {
+              float fi = float(i);
+              float lane = fi / 17.0;
+              float phase = t * (0.9 + lane * 1.8) + fi * 3.1;
+              vec2 head = vec2(
+                fract(phase * 0.18 + hash(fi * 11.7)),
+                0.18 + lane * 0.7 + 0.06 * sin(phase * 1.9 + fi)
+              );
+              vec2 rel = uv - head;
+              rel.x *= 1.9;
+              float trail = exp(-max(0.0, rel.x) * (18.0 + strength * 30.0));
+              float core = exp(-dot(rel, rel) * (350.0 + strength * 620.0));
+              float twinkle = 0.65 + 0.35 * sin(t * 20.0 + fi * 7.3);
+              total += (trail * 0.22 + core) * twinkle;
+            }
+            return total;
+          }
+
+          void main() {
+            vec2 uv = gl_FragCoord.xy / resolution.xy;
+            vec2 p = uv * 2.0 - 1.0;
+            p.x *= resolution.x / resolution.y;
+
+            float t = time * (0.35 + energy * 0.3);
+            float beatPulse = smoothstep(0.08, 0.95, beat);
+
+            float waveA = sin(p.x * 3.6 + t * 2.2 + sin(p.y * 4.1 + t));
+            float waveB = sin((p.x + p.y * 0.45) * 6.1 - t * 2.7);
+            float waveC = sin(p.x * 8.7 + t * 4.0 + waveB * 0.8);
+            float ridge = smoothstep(0.12, 0.96, abs(waveA * 0.65 + waveB * 0.35));
+
+            float band = 0.38 + 0.62 * ridge + 0.22 * waveC;
+            band += beatPulse * 0.18;
+
+            vec3 deepPink = vec3(0.22, 0.03, 0.20);
+            vec3 auroraPink = vec3(0.92, 0.26, 0.74);
+            vec3 hotPink = vec3(1.00, 0.48, 0.83);
+            vec3 color = mix(deepPink, auroraPink, clamp(band, 0.0, 1.0));
+            color = mix(color, hotPink, pow(max(band, 0.0), 1.8) * (0.45 + beatPulse * 0.5));
+
+            float sparkleStrength = 0.2 + energy * 0.35 + beatPulse * 1.2;
+            float trail = sparkleTrail(uv, time, sparkleStrength);
+            float grain = hash21(uv * resolution.xy * 0.6 + time) * 0.04;
+            vec3 sparkleColor = vec3(1.0, 0.85, 0.98);
+            color += sparkleColor * trail * (0.15 + beatPulse * 0.95);
+            color += grain;
+
+            float vignette = smoothstep(1.25, 0.2, length(p));
+            color *= vignette * (0.78 + beatPulse * 0.22);
+
+            color = gradeDesktopShaderRgb(color);
+            gl_FragColor = vec4(color, 1.0);
           }
         `;
         break;
@@ -167,6 +266,7 @@ const GalaxyBackground: React.FC<GalaxyBackgroundProps> = ({
           uniform vec2 resolution;
           uniform float time;
           varying vec2 vUv;
+          ${SHADER_GRADE_GLSL}
 
           mat3 rotate3D(float angle, vec3 axis) {
               axis = normalize(axis);
@@ -196,7 +296,8 @@ const GalaxyBackground: React.FC<GalaxyBackgroundProps> = ({
               }
 
               float dimFactor = 0.4;
-              gl_FragColor = vec4(o * dimFactor, 1.0);
+              vec3 rgb = gradeDesktopShaderRgb(o * dimFactor);
+              gl_FragColor = vec4(rgb, 1.0);
           }
         `;
     }
@@ -231,6 +332,15 @@ const GalaxyBackground: React.FC<GalaxyBackgroundProps> = ({
 
       // Update time uniform
       shaderMaterial.uniforms.time.value = clockRef.current.getElapsedTime();
+      const { beat, energy } = useAudioReactiveStore.getState();
+      shaderMaterial.uniforms.beat.value = Math.min(1, beat);
+      shaderMaterial.uniforms.energy.value = Math.min(1, energy);
+
+      const ds = useDisplaySettingsStore.getState();
+      const [tr, tg, tb] = hexToRgb01(ds.desktopShaderTintHex);
+      shaderMaterial.uniforms.uTint.value.set(tr, tg, tb);
+      shaderMaterial.uniforms.uTintMix.value = ds.desktopShaderTintMix;
+      shaderMaterial.uniforms.uSaturation.value = ds.desktopShaderSaturation;
 
       renderer.render(scene, camera);
     };

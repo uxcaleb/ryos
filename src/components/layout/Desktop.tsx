@@ -27,6 +27,7 @@ import {
   resolveMultiSelection,
   type SelectionPoint,
 } from "@/utils/selection";
+import { DesktopIpodNeuralOverlay } from "@/components/layout/DesktopIpodNeuralOverlay";
 
 interface DesktopStyles {
   backgroundImage?: string;
@@ -884,6 +885,7 @@ export function Desktop({
           display: isVideoWallpaper ? "block" : "none",
         }}
       />
+      <DesktopIpodNeuralOverlay />
       {/* Invisible draggable area for Tauri window on Windows themes */}
       {isTauriApp && isXpTheme && (
         <div

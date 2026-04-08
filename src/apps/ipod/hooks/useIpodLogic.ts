@@ -10,7 +10,6 @@ import { useTranslatedHelpItems } from "@/hooks/useTranslatedHelpItems";
 import { useLyrics } from "@/hooks/useLyrics";
 import { useFurigana } from "@/hooks/useFurigana";
 import { useActivityState } from "@/hooks/useActivityState";
-import { useLyricsErrorToast } from "@/hooks/useLyricsErrorToast";
 import { useCustomEventListener, useEventListener } from "@/hooks/useEventListener";
 import { useLibraryUpdateChecker } from "./useLibraryUpdateChecker";
 import {
@@ -1531,15 +1530,6 @@ export function useIpodLogic({
     soramimiTargetLanguage: romanization.soramamiTargetLanguage ?? "zh-TW",
     // Auth for force refresh / changing lyrics source
     auth,
-  });
-
-  // Show toast with Search button when lyrics fetch fails
-  useLyricsErrorToast({
-    error: fullScreenLyricsControls.error,
-    songId: currentTrack?.id,
-    onSearchClick: () => setIsLyricsSearchDialogOpen(true),
-    t,
-    appId: "ipod",
   });
 
   // Fetch furigana for lyrics and store in shared state

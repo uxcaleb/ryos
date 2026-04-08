@@ -157,6 +157,30 @@ const LazyCandyBarApp = createLazyComponent<unknown>(
   "candybar"
 );
 
+const LazyShaderSettingsApp = createLazyComponent<unknown>(
+  () =>
+    import("@/apps/shader-settings/components/ShaderSettingsAppComponent").then((m) => ({
+      default: m.ShaderSettingsAppComponent,
+    })),
+  "shader-settings"
+);
+
+const LazyMusicVisualizerApp = createLazyComponent<unknown>(
+  () =>
+    import("@/apps/music-visualizer/components/MusicVisualizerAppComponent").then((m) => ({
+      default: m.MusicVisualizerAppComponent,
+    })),
+  "music-visualizer"
+);
+
+const LazyVisualizerToggleApp = createLazyComponent<unknown>(
+  () =>
+    import("@/apps/visualizer-toggle/components/VisualizerToggleAppComponent").then((m) => ({
+      default: m.VisualizerToggleAppComponent,
+    })),
+  "visualizer-toggle"
+);
+
 // ============================================================================
 // APP METADATA (loaded eagerly - small, isolated from components)
 // Import from metadata.ts files to avoid eager loading of components
@@ -189,6 +213,18 @@ import { appMetadata as calendarMetadata, helpItems as calendarHelpItems } from 
 import { appMetadata as contactsMetadata, helpItems as contactsHelpItems } from "@/apps/contacts";
 import { appMetadata as dashboardMetadata, helpItems as dashboardHelpItems } from "@/apps/dashboard/metadata";
 import { appMetadata as candybarMetadata, helpItems as candybarHelpItems } from "@/apps/candybar/metadata";
+import {
+  appMetadata as shaderSettingsMetadata,
+  helpItems as shaderSettingsHelpItems,
+} from "@/apps/shader-settings/metadata";
+import {
+  appMetadata as musicVisualizerMetadata,
+  helpItems as musicVisualizerHelpItems,
+} from "@/apps/music-visualizer/metadata";
+import {
+  appMetadata as visualizerToggleMetadata,
+  helpItems as visualizerToggleHelpItems,
+} from "@/apps/visualizer-toggle/metadata";
 import { DEFAULT_WINDOW_SIZE_WITH_TITLEBAR as infiniteMacDefaultSize } from "@/apps/infinite-mac/hooks/useInfiniteMacLogic";
 
 // ============================================================================
@@ -515,6 +551,45 @@ export const appRegistry = {
     windowConfig: {
       defaultSize: { width: 680, height: 460 },
       minSize: { width: 500, height: 350 },
+    } as WindowConstraints,
+  },
+  ["shader-settings"]: {
+    id: "shader-settings",
+    name: "Shader Settings",
+    icon: { type: "image", src: shaderSettingsMetadata.icon },
+    description: "Tune desktop shaders and music visualizers",
+    component: LazyShaderSettingsApp,
+    helpItems: shaderSettingsHelpItems,
+    metadata: shaderSettingsMetadata,
+    windowConfig: {
+      defaultSize: { width: 420, height: 520 },
+      minSize: { width: 360, height: 400 },
+    } as WindowConstraints,
+  },
+  ["music-visualizer"]: {
+    id: "music-visualizer",
+    name: "Music Visualizer",
+    icon: { type: "image", src: musicVisualizerMetadata.icon },
+    description: "Live mood shaders driven by your music",
+    component: LazyMusicVisualizerApp,
+    helpItems: musicVisualizerHelpItems,
+    metadata: musicVisualizerMetadata,
+    windowConfig: {
+      defaultSize: { width: 520, height: 440 },
+      minSize: { width: 380, height: 320 },
+    } as WindowConstraints,
+  },
+  ["visualizer-toggle"]: {
+    id: "visualizer-toggle",
+    name: "Visualizer Switch",
+    icon: { type: "image", src: visualizerToggleMetadata.icon },
+    description: "Turn music-reactive background and app visuals on or off",
+    component: LazyVisualizerToggleApp,
+    helpItems: visualizerToggleHelpItems,
+    metadata: visualizerToggleMetadata,
+    windowConfig: {
+      defaultSize: { width: 320, height: 220 },
+      minSize: { width: 280, height: 200 },
     } as WindowConstraints,
   },
 } as const;

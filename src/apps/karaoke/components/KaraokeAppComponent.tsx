@@ -39,6 +39,9 @@ import { WaterBackground } from "@/components/shared/WaterBackground";
 import { PLAYER_PROGRESS_INTERVAL_MS } from "@/apps/ipod/constants";
 import { useChatsStore } from "@/stores/useChatsStore";
 import { useShallow } from "zustand/react/shallow";
+import { usePlaybackAudioReactive } from "@/hooks/usePlaybackAudioReactive";
+import { KaraokeLyricAudioReactiveBridge } from "./KaraokeLyricAudioReactiveBridge";
+import { KaraokeMoodShaderBlock } from "./KaraokeMoodShaderBlock";
 
 export function KaraokeAppComponent({
   isWindowOpen,
@@ -189,11 +192,23 @@ export function KaraokeAppComponent({
     [username, isAuthenticated]
   );
 
+  usePlaybackAudioReactive({
+    url: currentTrack?.url,
+    isPlaying: isPlaying && !isListenSessionRemoteOnly,
+    isFullScreen,
+    windowPlayerRef: playerRef,
+    fullScreenPlayerRef,
+    ambientFallback: "none",
+  });
+
   const displayModeOptions = [
     { value: DisplayMode.Video, label: t("apps.ipod.menu.displayVideo") },
     { value: DisplayMode.Mesh, label: t("apps.ipod.menu.displayGradient") },
     { value: DisplayMode.Water, label: t("apps.ipod.menu.displayWater") },
     { value: DisplayMode.Shader, label: t("apps.ipod.menu.displayShader") },
+    { value: DisplayMode.VisualizerNeural, label: t("apps.ipod.menu.displayVizNeural") },
+    { value: DisplayMode.VisualizerBlobs, label: t("apps.ipod.menu.displayVizBlobs") },
+    { value: DisplayMode.VisualizerSwirl, label: t("apps.ipod.menu.displayVizSwirl") },
     { value: DisplayMode.Landscapes, label: t("apps.ipod.menu.displayLandscapes") },
     { value: DisplayMode.Cover, label: t("apps.ipod.menu.displayCover") },
   ];
@@ -208,6 +223,9 @@ export function KaraokeAppComponent({
         [DisplayMode.Shader]: t("apps.ipod.menu.displayShader"),
         [DisplayMode.Mesh]: t("apps.ipod.menu.displayGradient"),
         [DisplayMode.Water]: t("apps.ipod.menu.displayWater"),
+        [DisplayMode.VisualizerNeural]: t("apps.ipod.menu.displayVizNeural"),
+        [DisplayMode.VisualizerBlobs]: t("apps.ipod.menu.displayVizBlobs"),
+        [DisplayMode.VisualizerSwirl]: t("apps.ipod.menu.displayVizSwirl"),
       };
       const label = labels[value] ?? value;
       showStatus(`${t("apps.ipod.menu.display", "Display")}: ${label}`);
@@ -417,14 +435,25 @@ export function KaraokeAppComponent({
             restartAutoHideTimer();
           }}
         >
-          <KaraokeIosAutoplayWatchdog
-            listenSession={listenSession}
-            isListenSessionDj={isListenSessionDj}
-            isPlaying={isPlaying}
-            setIsPlaying={setIsPlaying}
-            showStatus={showStatus}
-            userHasInteractedRef={userHasInteractedRef}
-          />
+          <KaraokeLyricsPlaybackProvider
+            currentTrack={currentTrack}
+            lyricsFont={lyricsFont}
+            romanization={romanization}
+            lyricsTranslationLanguage={lyricsTranslationLanguage}
+            lyricsSourceOverride={lyricsSourceOverride}
+            isAddingSong={isAddingSong}
+            auth={auth}
+            lyricsPlaybackSyncRef={lyricsPlaybackSyncRef}
+          >
+            <KaraokeLyricAudioReactiveBridge />
+            <KaraokeIosAutoplayWatchdog
+              listenSession={listenSession}
+              isListenSessionDj={isListenSessionDj}
+              isPlaying={isPlaying}
+              setIsPlaying={setIsPlaying}
+              showStatus={showStatus}
+              userHasInteractedRef={userHasInteractedRef}
+            />
           {/* Reaction overlay for listen sessions */}
           {listenSession && !isSyncModeOpen && (
             <ReactionOverlay className="z-40" />
@@ -521,6 +550,15 @@ export function KaraokeAppComponent({
             />
           )}
 
+          <KaraokeMoodShaderBlock
+            displayMode={effectiveDisplayMode}
+            currentTrack={currentTrack}
+            coverUrl={coverUrl}
+            duration={duration}
+            shouldAnimateVisuals={shouldAnimateVisuals}
+            className="absolute inset-0 z-[5]"
+          />
+
           {/* Cover overlay: shows when paused (any mode) or always in Cover mode */}
           <AnimatePresence>
             {currentTrack &&
@@ -551,18 +589,6 @@ export function KaraokeAppComponent({
             )}
           </AnimatePresence>
 
-          <KaraokeLyricsPlaybackProvider
-            currentTrack={currentTrack}
-            lyricsFont={lyricsFont}
-            romanization={romanization}
-            lyricsTranslationLanguage={lyricsTranslationLanguage}
-            lyricsSourceOverride={lyricsSourceOverride}
-            isAddingSong={isAddingSong}
-            setIsLyricsSearchDialogOpen={setIsLyricsSearchDialogOpen}
-            t={t}
-            auth={auth}
-            lyricsPlaybackSyncRef={lyricsPlaybackSyncRef}
-          >
             <KaraokeWindowLyricsOverlay
               showLyrics={showLyrics}
               isFullScreen={isFullScreen}
@@ -802,8 +828,6 @@ export function KaraokeAppComponent({
           lyricsTranslationLanguage={lyricsTranslationLanguage}
           lyricsSourceOverride={lyricsSourceOverride}
           isAddingSong={isAddingSong}
-          setIsLyricsSearchDialogOpen={setIsLyricsSearchDialogOpen}
-          t={t}
           auth={auth}
           lyricsPlaybackSyncRef={lyricsPlaybackSyncRef}
         >
@@ -964,6 +988,15 @@ export function KaraokeAppComponent({
                     className="fixed inset-0 z-[5]"
                   />
                 )}
+
+                <KaraokeMoodShaderBlock
+                  displayMode={effectiveDisplayMode}
+                  currentTrack={currentTrack}
+                  coverUrl={coverUrl}
+                  duration={duration}
+                  shouldAnimateVisuals={shouldAnimateVisuals}
+                  className="fixed inset-0 z-[5]"
+                />
 
                 {/* Cover overlay: shows when paused (any mode) or always in Cover mode */}
                 <AnimatePresence>

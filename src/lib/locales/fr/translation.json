@@ -1010,6 +1010,11 @@
         "toolExecutionFailed": "Échec de l'exécution de l'outil",
         "unknownError": "Erreur inconnue",
         "updatedDocument": "Document mis à jour : {{path}}",
+        "webFetch": {
+          "fetched": "Read {{siteName}}",
+          "fetchedPage": "Read \"{{title}}\"",
+          "fetching": "Reading {{hostname}}…"
+        },
         "writingContent": "Écriture du contenu…"
       }
     },
@@ -1898,6 +1903,7 @@
       "openingSharedPage": "Ouverture de la page partagée",
       "page": "Page",
       "pageCouldNotBeLoadedInIframe": "La page n'a pas pu être chargée dans l'iframe. Cela peut être dû à des restrictions de sécurité ou à des problèmes de réseau.",
+      "pinkTrailAurora": "Pink Trail Aurora",
       "pleaseTryTheFollowing": "Veuillez essayer ce qui suit :",
       "portugal": "Portugal",
       "portuguese": "Portugais",
@@ -2072,6 +2078,9 @@
         "displayMesh": "Maillage",
         "displayShader": "Warp",
         "displayVideo": "Vidéo",
+        "displayVizBlobs": "Plasma",
+        "displayVizNeural": "Neural web",
+        "displayVizSwirl": "Aurora swirl",
         "displayWater": "Eau",
         "enableRomanization": "Activer la romanisation",
         "exportLibrary": "Exporter la bibliothèque...",
@@ -2228,11 +2237,6 @@
         "copyFailedDescription": "Sélectionnez le lien et copiez-le manuellement.",
         "copyLink": "Copier le lien",
         "djLabel": "DJ",
-        "playbackBadge": "Lecture",
-        "playbackOnDevice": "Appareil de lecture",
-        "passPlayback": "Transférer la lecture",
-        "makeHost": "Nommer hôte",
-        "remoteBadge": "Télécommande",
         "end": "Fermer la salle KTV",
         "endSession": "Fermer la salle",
         "hostLabel": "Hôte",
@@ -2251,11 +2255,16 @@
         "listenerPlural": "personnes",
         "listening": "{{count}} dans la salle",
         "loadingSessions": "Chargement des salles...",
+        "makeHost": "Nommer hôte",
         "noActiveSessions": "Aucune salle KTV active",
         "nowPlaying": "En train de chanter",
         "orEnterSessionId": "Ou saisissez l'ID de la salle",
+        "passPlayback": "Transférer la lecture",
         "pasteLinkOrId": "Collez un lien ou un ID de salle pour rejoindre.",
+        "playbackBadge": "Lecture",
+        "playbackOnDevice": "Appareil de lecture",
         "refreshSessions": "Actualiser",
+        "remoteBadge": "Télécommande",
         "sendReaction": "Envoyer une réaction",
         "sessionLinkPlaceholder": "Lien ou ID de salle",
         "shareLinkInvite": "Partagez ce lien pour inviter des amis dans la salle KTV.",
@@ -2326,6 +2335,49 @@
         "newGame": "Nouvelle partie"
       },
       "name": "Démineur"
+    },
+    "music-visualizer": {
+      "description": "Live mood shaders driven by your music",
+      "disabledInShaderSettings": "Music-reactive visuals are turned off in Shader Settings. Turn them on there to see the visualization.",
+      "help": {
+        "fineTune": {
+          "description": "Use Shader Settings to adjust beat sensitivity and visual motion globally",
+          "title": "Fine-tune"
+        },
+        "helpMenu": {
+          "description": "Open Help from the Help menu for this overview anytime",
+          "title": "Help"
+        },
+        "liveAudio": {
+          "description": "Motion follows the beat and spectrum from Karaoke or iPod when music is playing",
+          "title": "Live audio"
+        },
+        "threeLooks": {
+          "description": "Switch between Neural web, Light rays, and Aurora swirl from the toolbar",
+          "title": "Three looks"
+        },
+        "trackMood": {
+          "description": "Colors come from BPM, key, and lyrics — not from album art",
+          "title": "Track mood"
+        },
+        "worksWithKaraoke": {
+          "description": "Open Karaoke or iPod, play a song, and this window reacts in real time",
+          "title": "Works with Karaoke"
+        }
+      },
+      "hint": "Play music in Karaoke or iPod — motion follows the audio in real time.",
+      "menu": {
+        "about": "About Music Visualizer",
+        "help": "Music Visualizer Help"
+      },
+      "modeLabel": "Visualization",
+      "modes": {
+        "blobs": "Light rays",
+        "neural": "Neural web",
+        "swirl": "Aurora swirl"
+      },
+      "name": "Music Visualizer",
+      "title": "Music Visualizer"
     },
     "paint": {
       "description": "Dessiner et modifier des images",
@@ -2541,6 +2593,95 @@
         "photoBoothHelp": "Aide Photomaton"
       },
       "name": "Photomaton"
+    },
+    "shader-settings": {
+      "description": "Tune desktop shaders and music visualizers",
+      "desktop": {
+        "colorsTitle": "Desktop colors",
+        "resetColors": "Reset colors",
+        "saturation": {
+          "hint": "0 is grayscale, 1 is normal, 2 is boosted color",
+          "label": "Saturation"
+        },
+        "shaderEffect": "Animated desktop shader",
+        "shaderEffectHint": "GPU-heavy background effect on the desktop",
+        "shaderType": "Shader style",
+        "tintColor": "Tint",
+        "tintMix": {
+          "hint": "How much the tint color multiplies into the wallpaper (0 = original)",
+          "label": "Tint strength"
+        }
+      },
+      "help": {
+        "beatReaction": {
+          "description": "Increase beat sensitivity for stronger kick detection, or lengthen the tail for smoother decay",
+          "title": "Beat reaction"
+        },
+        "desktopShader": {
+          "description": "Turn the animated desktop shader on or off and pick Galaxy, Aurora, or Nebula",
+          "title": "Desktop shader"
+        },
+        "fftSmoothing": {
+          "description": "Adjust FFT and band smoothing — lower values react faster; higher values look calmer",
+          "title": "Analyzer smoothing"
+        },
+        "lyricPulse": {
+          "description": "When YouTube hides audio analysis, scales pulses timed from lyrics",
+          "title": "Lyric pulse"
+        },
+        "resetDefaults": {
+          "description": "Restore music visualizer sliders to their factory defaults anytime",
+          "title": "Reset"
+        },
+        "visualMotion": {
+          "description": "Scales how much music drives shaders in Karaoke, iPod, and cover backgrounds",
+          "title": "Visual motion"
+        }
+      },
+      "intro": "Control desktop shaders, Music Visualizer style, and how audio drives on-screen motion. Wallpaper and system theme live in Control Panels.",
+      "menu": {
+        "about": "About Shader Settings",
+        "help": "Shader Settings Help"
+      },
+      "music": {
+        "bandSmoothing": {
+          "hint": "Smoothing for bass, mids, treble, and overall energy",
+          "label": "Level smoothing"
+        },
+        "beatSensitivity": {
+          "hint": "How strongly kicks and transients register as a beat pulse",
+          "label": "Beat sensitivity"
+        },
+        "beatTail": {
+          "hint": "How quickly the beat envelope decays between hits",
+          "label": "Beat tail"
+        },
+        "fftSmoothing": {
+          "hint": "Frequency-domain smoothing on the Web Audio analyzer",
+          "label": "Analyzer smoothing"
+        },
+        "lyricPulse": {
+          "hint": "When FFT is unavailable (e.g. YouTube), scales lyric-timed pulses",
+          "label": "Lyric pulse"
+        },
+        "reactiveEnabled": "Music-reactive visuals",
+        "reactiveEnabledHint": "Mood shaders and audio backgrounds in iPod, Karaoke, and Music Visualizer",
+        "resetDefaults": "Reset music defaults",
+        "visualMotion": {
+          "hint": "How strongly audio drives mood shaders and cover backgrounds",
+          "label": "Visual motion"
+        }
+      },
+      "name": "Shader Settings",
+      "openAppearance": "Wallpaper & theme…",
+      "resetAll": "Reset all",
+      "sections": {
+        "desktop": "Desktop background",
+        "music": "Audio reaction",
+        "visualizer": "Music Visualizer style"
+      },
+      "title": "Shader Settings",
+      "visualizerStyleHint": "Matches the Music Visualizer app — Neural web, Light rays, or Aurora swirl."
     },
     "soundboard": {
       "description": "Lire des effets sonores",
@@ -3034,6 +3175,44 @@
         "unknownError": "Erreur inconnue",
         "videoAdded": "VIDÉO AJOUTÉE"
       }
+    },
+    "visualizer-toggle": {
+      "buttonOff": "[TODO] Background visualizer: Off",
+      "buttonOn": "[TODO] Background visualizer: On",
+      "description": "[TODO] Turn music-reactive background and app visuals on or off",
+      "help": {
+        "desktopWallpaper": {
+          "description": "[TODO] Controls the iPod desktop mood overlay and audio-reactive wallpaper layers",
+          "title": "[TODO] Desktop & wallpaper"
+        },
+        "helpMenu": {
+          "description": "[TODO] Open Help from the menu for this overview anytime",
+          "title": "[TODO] Help"
+        },
+        "ipodKaraoke": {
+          "description": "[TODO] When off, in-app mood shaders and overlays hide while audio keeps playing",
+          "title": "[TODO] iPod & Karaoke"
+        },
+        "oneTap": {
+          "description": "[TODO] Tap the big button to turn music-reactive visuals on or off everywhere they apply",
+          "title": "[TODO] One tap"
+        },
+        "savedChoice": {
+          "description": "[TODO] Your choice is remembered across sessions with your other display settings",
+          "title": "[TODO] Saved"
+        },
+        "shaderSettingsMore": {
+          "description": "[TODO] Shader Settings still controls beat reaction, motion, and the animated desktop shader",
+          "title": "[TODO] More control"
+        }
+      },
+      "hint": "[TODO] Music-reactive shaders on the desktop, wallpaper, iPod, and Karaoke.",
+      "menu": {
+        "about": "[TODO] About Visualizer Switch",
+        "help": "[TODO] Visualizer Switch Help"
+      },
+      "name": "[TODO] Visualizer Switch",
+      "title": "[TODO] Visualizer Switch"
     },
     "winamp": {
       "description": "Lecteur multimédia Winamp classique",

@@ -621,6 +621,33 @@ export function KaraokeMenuBar({
                 {t("apps.ipod.menu.displayShader")}
               </MenubarCheckboxItem>
               <MenubarCheckboxItem
+                checked={displayMode === DisplayMode.VisualizerNeural}
+                onCheckedChange={(checked) => {
+                  if (checked) setDisplayMode(DisplayMode.VisualizerNeural);
+                }}
+                className="text-md h-6 pr-3"
+              >
+                {t("apps.ipod.menu.displayVizNeural")}
+              </MenubarCheckboxItem>
+              <MenubarCheckboxItem
+                checked={displayMode === DisplayMode.VisualizerBlobs}
+                onCheckedChange={(checked) => {
+                  if (checked) setDisplayMode(DisplayMode.VisualizerBlobs);
+                }}
+                className="text-md h-6 pr-3"
+              >
+                {t("apps.ipod.menu.displayVizBlobs")}
+              </MenubarCheckboxItem>
+              <MenubarCheckboxItem
+                checked={displayMode === DisplayMode.VisualizerSwirl}
+                onCheckedChange={(checked) => {
+                  if (checked) setDisplayMode(DisplayMode.VisualizerSwirl);
+                }}
+                className="text-md h-6 pr-3"
+              >
+                {t("apps.ipod.menu.displayVizSwirl")}
+              </MenubarCheckboxItem>
+              <MenubarCheckboxItem
                 checked={displayMode === DisplayMode.Landscapes}
                 onCheckedChange={(checked) => {
                   if (checked) setDisplayMode(DisplayMode.Landscapes);

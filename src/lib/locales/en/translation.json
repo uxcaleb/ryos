@@ -601,6 +601,7 @@
       "galaxy": "Galaxy",
       "aurora": "Aurora",
       "nebula": "Nebula",
+      "pinkTrailAurora": "Pink Trail Aurora",
       "off": "Off",
       "oldest": "Oldest",
       "newest": "Newest",
@@ -1593,6 +1594,9 @@
         "displayMesh": "Mesh",
         "displayGradient": "Gradient",
         "displayWater": "Water",
+        "displayVizNeural": "Neural web",
+        "displayVizBlobs": "Light rays",
+        "displayVizSwirl": "Aurora swirl",
         "coverFlow": "Cover Flow",
         "classic": "Classic",
         "black": "Black",
@@ -3079,6 +3083,176 @@
           "description": "Remove all icon packs from the library? You can sync to restore built-in packs."
         },
         "addPackComingSoon": "Add icon pack — coming soon"
+      }
+    },
+    "shader-settings": {
+      "name": "Shader Settings",
+      "title": "Shader Settings",
+      "description": "Tune desktop shaders and music visualizers",
+      "intro": "Control desktop shaders, Music Visualizer style, and how audio drives on-screen motion. Wallpaper and system theme live in Control Panels.",
+      "resetAll": "Reset all",
+      "openAppearance": "Wallpaper & theme…",
+      "menu": {
+        "help": "Shader Settings Help",
+        "about": "About Shader Settings"
+      },
+      "sections": {
+        "desktop": "Desktop background",
+        "visualizer": "Music Visualizer style",
+        "music": "Audio reaction"
+      },
+      "visualizerStyleHint": "Matches the Music Visualizer app — Neural web, Light rays, or Aurora swirl.",
+      "desktop": {
+        "shaderEffect": "Animated desktop shader",
+        "shaderEffectHint": "GPU-heavy background effect on the desktop",
+        "shaderType": "Shader style",
+        "colorsTitle": "Desktop colors",
+        "resetColors": "Reset colors",
+        "tintColor": "Tint",
+        "tintMix": {
+          "label": "Tint strength",
+          "hint": "How much the tint color multiplies into the wallpaper (0 = original)"
+        },
+        "saturation": {
+          "label": "Saturation",
+          "hint": "0 is grayscale, 1 is normal, 2 is boosted color"
+        }
+      },
+      "music": {
+        "reactiveEnabled": "Music-reactive visuals",
+        "reactiveEnabledHint": "Mood shaders and audio backgrounds in iPod, Karaoke, and Music Visualizer",
+        "resetDefaults": "Reset music defaults",
+        "beatSensitivity": {
+          "label": "Beat sensitivity",
+          "hint": "How strongly kicks and transients register as a beat pulse"
+        },
+        "beatTail": {
+          "label": "Beat tail",
+          "hint": "How quickly the beat envelope decays between hits"
+        },
+        "fftSmoothing": {
+          "label": "Analyzer smoothing",
+          "hint": "Frequency-domain smoothing on the Web Audio analyzer"
+        },
+        "bandSmoothing": {
+          "label": "Level smoothing",
+          "hint": "Smoothing for bass, mids, treble, and overall energy"
+        },
+        "lyricPulse": {
+          "label": "Lyric pulse",
+          "hint": "When FFT is unavailable (e.g. YouTube), scales lyric-timed pulses"
+        },
+        "visualMotion": {
+          "label": "Visual motion",
+          "hint": "How strongly audio drives mood shaders and cover backgrounds"
+        }
+      },
+      "help": {
+        "desktopShader": {
+          "title": "Desktop shader",
+          "description": "Turn the animated desktop shader on or off and pick Galaxy, Aurora, or Nebula"
+        },
+        "beatReaction": {
+          "title": "Beat reaction",
+          "description": "Increase beat sensitivity for stronger kick detection, or lengthen the tail for smoother decay"
+        },
+        "fftSmoothing": {
+          "title": "Analyzer smoothing",
+          "description": "Adjust FFT and band smoothing — lower values react faster; higher values look calmer"
+        },
+        "visualMotion": {
+          "title": "Visual motion",
+          "description": "Scales how much music drives shaders in Karaoke, iPod, and cover backgrounds"
+        },
+        "lyricPulse": {
+          "title": "Lyric pulse",
+          "description": "When YouTube hides audio analysis, scales pulses timed from lyrics"
+        },
+        "resetDefaults": {
+          "title": "Reset",
+          "description": "Restore music visualizer sliders to their factory defaults anytime"
+        }
+      }
+    },
+    "music-visualizer": {
+      "name": "Music Visualizer",
+      "title": "Music Visualizer",
+      "description": "Live mood shaders driven by your music",
+      "menu": {
+        "help": "Music Visualizer Help",
+        "about": "About Music Visualizer"
+      },
+      "modeLabel": "Visualization",
+      "hint": "Play music in Karaoke or iPod — motion follows the audio in real time.",
+      "disabledInShaderSettings": "Music-reactive visuals are turned off in Shader Settings. Turn them on there to see the visualization.",
+      "modes": {
+        "neural": "Neural web",
+        "blobs": "Light rays",
+        "swirl": "Aurora swirl"
+      },
+      "help": {
+        "threeLooks": {
+          "title": "Three looks",
+          "description": "Switch between Neural web, Light rays, and Aurora swirl from the toolbar"
+        },
+        "liveAudio": {
+          "title": "Live audio",
+          "description": "Motion follows the beat and spectrum from Karaoke or iPod when music is playing"
+        },
+        "trackMood": {
+          "title": "Track mood",
+          "description": "Neural web tints from the current track's cover art when available; Light rays and Aurora swirl use mood palettes from BPM, key, and lyrics"
+        },
+        "worksWithKaraoke": {
+          "title": "Works with Karaoke",
+          "description": "Open Karaoke or iPod, play a song, and this window reacts in real time"
+        },
+        "fineTune": {
+          "title": "Fine-tune",
+          "description": "Use Shader Settings to adjust beat sensitivity and visual motion globally"
+        },
+        "helpMenu": {
+          "title": "Help",
+          "description": "Open Help from the Help menu for this overview anytime"
+        }
+      }
+    },
+    "visualizer-toggle": {
+      "name": "Visualizer Switch",
+      "title": "Visualizer Switch",
+      "description": "Turn music-reactive background and app visuals on or off",
+      "menu": {
+        "help": "Visualizer Switch Help",
+        "about": "About Visualizer Switch"
+      },
+      "hint": "Music-reactive shaders on the desktop, wallpaper, iPod, and Karaoke.",
+      "buttonOn": "Background visualizer: On",
+      "buttonOff": "Background visualizer: Off",
+      "help": {
+        "oneTap": {
+          "title": "One tap",
+          "description": "Tap the big button to turn music-reactive visuals on or off everywhere they apply"
+        },
+        "desktopWallpaper": {
+          "title": "Desktop & wallpaper",
+          "description": "Controls the iPod desktop mood overlay and audio-reactive wallpaper layers"
+        },
+        "ipodKaraoke": {
+          "title": "iPod & Karaoke",
+          "description": "When off, in-app mood shaders and overlays hide while audio keeps playing"
+        },
+        "savedChoice": {
+          "title": "Saved",
+          "description": "Your choice is remembered across sessions with your other display settings"
+        },
+        "shaderSettingsMore": {
+          "title": "More control",
+          "description": "Shader Settings still controls beat reaction, motion, and the animated desktop shader"
+        },
+        "helpMenu": {
+          "title": "Help",
+          "description": "Open Help from the menu for this overview anytime"
+        }
       }
     },
     "admin": {

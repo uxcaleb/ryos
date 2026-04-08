@@ -79,8 +79,21 @@ interface DisplaySettingsState {
   // Shader settings
   shaderEffectEnabled: boolean;
   selectedShaderType: ShaderType;
+  /** When false, mood / audio-reactive layers in iPod, Karaoke, Music Visualizer are hidden. */
+  musicShaderEffectsEnabled: boolean;
+  /** Desktop GalaxyBackground color grade: hex tint (#RRGGBB). */
+  desktopShaderTintHex: string;
+  /** 0 = no tint, 1 = full multiply by tint color. */
+  desktopShaderTintMix: number;
+  /** 0 = grayscale, 1 = default, 2 = boosted color. */
+  desktopShaderSaturation: number;
   setShaderEffectEnabled: (v: boolean) => void;
   setSelectedShaderType: (t: ShaderType) => void;
+  setMusicShaderEffectsEnabled: (v: boolean) => void;
+  setDesktopShaderTintHex: (hex: string) => void;
+  setDesktopShaderTintMix: (v: number) => void;
+  setDesktopShaderSaturation: (v: number) => void;
+  resetDesktopShaderColors: () => void;
 
   // Wallpaper
   currentWallpaper: string;
@@ -125,8 +138,24 @@ export const useDisplaySettingsStore = create<DisplaySettingsState>()(
       // Shader settings
       shaderEffectEnabled: initialShaderState,
       selectedShaderType: ShaderType.AURORA,
+      musicShaderEffectsEnabled: true,
+      desktopShaderTintHex: "#ffffff",
+      desktopShaderTintMix: 0,
+      desktopShaderSaturation: 1,
       setShaderEffectEnabled: (enabled) => set({ shaderEffectEnabled: enabled }),
       setSelectedShaderType: (t) => set({ selectedShaderType: t }),
+      setMusicShaderEffectsEnabled: (enabled) => set({ musicShaderEffectsEnabled: enabled }),
+      setDesktopShaderTintHex: (hex) => set({ desktopShaderTintHex: hex }),
+      setDesktopShaderTintMix: (v) =>
+        set({ desktopShaderTintMix: Math.min(1, Math.max(0, v)) }),
+      setDesktopShaderSaturation: (v) =>
+        set({ desktopShaderSaturation: Math.min(2, Math.max(0, v)) }),
+      resetDesktopShaderColors: () =>
+        set({
+          desktopShaderTintHex: "#ffffff",
+          desktopShaderTintMix: 0,
+          desktopShaderSaturation: 1,
+        }),
 
       // Wallpaper
       currentWallpaper: "/wallpapers/photos/aqua/water.jpg",
@@ -279,6 +308,10 @@ export const useDisplaySettingsStore = create<DisplaySettingsState>()(
         displayMode: state.displayMode,
         shaderEffectEnabled: state.shaderEffectEnabled,
         selectedShaderType: state.selectedShaderType,
+        musicShaderEffectsEnabled: state.musicShaderEffectsEnabled,
+        desktopShaderTintHex: state.desktopShaderTintHex,
+        desktopShaderTintMix: state.desktopShaderTintMix,
+        desktopShaderSaturation: state.desktopShaderSaturation,
         currentWallpaper: state.currentWallpaper,
         wallpaperSource: state.wallpaperSource,
         screenSaverEnabled: state.screenSaverEnabled,
@@ -292,6 +325,46 @@ export const useDisplaySettingsStore = create<DisplaySettingsState>()(
           ...currentState,
           ...(persistedState as Partial<DisplaySettingsState> | undefined),
         };
+        const validShaderTypes = new Set<string>(Object.values(ShaderType));
+        if (
+          merged.selectedShaderType == null ||
+          !validShaderTypes.has(String(merged.selectedShaderType))
+        ) {
+          merged.selectedShaderType = ShaderType.AURORA;
+        }
+        if (merged.musicShaderEffectsEnabled === undefined) {
+          merged.musicShaderEffectsEnabled = true;
+        }
+        if (
+          typeof merged.desktopShaderTintHex !== "string" ||
+          !/^#?[0-9a-fA-F]{6}$/.test(merged.desktopShaderTintHex.trim())
+        ) {
+          merged.desktopShaderTintHex = "#ffffff";
+        } else if (!merged.desktopShaderTintHex.startsWith("#")) {
+          merged.desktopShaderTintHex = `#${merged.desktopShaderTintHex}`;
+        }
+        if (
+          merged.desktopShaderTintMix === undefined ||
+          Number.isNaN(merged.desktopShaderTintMix as number)
+        ) {
+          merged.desktopShaderTintMix = 0;
+        } else {
+          merged.desktopShaderTintMix = Math.min(
+            1,
+            Math.max(0, merged.desktopShaderTintMix as number)
+          );
+        }
+        if (
+          merged.desktopShaderSaturation === undefined ||
+          Number.isNaN(merged.desktopShaderSaturation as number)
+        ) {
+          merged.desktopShaderSaturation = 1;
+        } else {
+          merged.desktopShaderSaturation = Math.min(
+            2,
+            Math.max(0, merged.desktopShaderSaturation as number)
+          );
+        }
         const cw = merged.currentWallpaper;
         const ws = merged.wallpaperSource;
         // Persisted blob: object URLs are invalid after reload; never hydrate them as the CSS/video src.

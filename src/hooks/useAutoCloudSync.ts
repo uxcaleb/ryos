@@ -1305,6 +1305,10 @@ export function useAutoCloudSync() {
           state.displayMode !== prevState.displayMode ||
           state.shaderEffectEnabled !== prevState.shaderEffectEnabled ||
           state.selectedShaderType !== prevState.selectedShaderType ||
+          state.musicShaderEffectsEnabled !== prevState.musicShaderEffectsEnabled ||
+          state.desktopShaderTintHex !== prevState.desktopShaderTintHex ||
+          state.desktopShaderTintMix !== prevState.desktopShaderTintMix ||
+          state.desktopShaderSaturation !== prevState.desktopShaderSaturation ||
           state.currentWallpaper !== prevState.currentWallpaper ||
           state.screenSaverEnabled !== prevState.screenSaverEnabled ||
           state.screenSaverType !== prevState.screenSaverType ||

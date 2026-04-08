@@ -1,5 +1,8 @@
 import { useRef, useEffect, useCallback } from "react";
 import * as THREE from "three";
+import { useAudioReactiveStore } from "@/stores/useAudioReactiveStore";
+import { useAudioShaderSettingsStore } from "@/stores/useAudioShaderSettingsStore";
+import { useDisplaySettingsStore } from "@/stores/useDisplaySettingsStore";
 
 /** Duration of crossfade between cover textures (seconds) */
 const CROSSFADE_SECONDS = 1.5;
@@ -36,6 +39,7 @@ const vertexShader = `
 const liquidFragmentShader = `
   uniform vec2 resolution;
   uniform float time;
+  uniform float audioBoost;
   uniform sampler2D coverTextureA;
   uniform sampler2D coverTextureB;
   uniform float blendFactor;
@@ -70,13 +74,13 @@ const liquidFragmentShader = `
     vec2 uv = gl_FragCoord.xy / resolution.xy;
     float aspect = resolution.x / resolution.y;
     vec2 centered = (uv - 0.5) * vec2(aspect, 1.0);
-    float t = time * SPEED;
+    float t = time * SPEED * (1.0 + audioBoost * 0.65);
 
     vec2 texUV = (uv - 0.5) / ZOOM + 0.5;
     texUV += vec2(sin(t * 0.7) * 0.015, cos(t * 0.5) * 0.015);
 
     vec2 nc = centered * 2.5 + t * 0.4;
-    vec2 distort = (vec2(fbm(nc), fbm(nc + 73.0)) - 0.5) * DISTORTION;
+    vec2 distort = (vec2(fbm(nc), fbm(nc + 73.0)) - 0.5) * DISTORTION * (1.0 + audioBoost * 0.95);
 
     float dist = length(centered);
     float angle = dist * SWIRL * sin(t * 0.35);
@@ -127,6 +131,7 @@ const liquidFragmentShader = `
 const warpFragmentShader = `
   uniform vec2 resolution;
   uniform float time;
+  uniform float audioBoost;
   uniform sampler2D coverTextureA;
   uniform sampler2D coverTextureB;
   uniform float blendFactor;
@@ -135,7 +140,7 @@ const warpFragmentShader = `
   void main() {
     float s = 0.0, v = 0.0;
     vec2 uv = (gl_FragCoord.xy / resolution.xy) * 2.0 - 1.0;
-    float t = (time - 2.0) * 80.0;
+    float t = (time - 2.0) * 80.0 * (1.0 + audioBoost * 0.55);
 
     vec3 init = vec3(
       sin(t * 0.0032) * 0.3,
@@ -152,7 +157,7 @@ const warpFragmentShader = `
         p = abs(p * 2.04) / dot(p, p) - 0.9;
       }
 
-      v += pow(dot(p, p), 0.7) * 0.06;
+      v += pow(dot(p, p), 0.7) * 0.06 * (1.0 + audioBoost * 0.4);
 
       vec2 texUV = fract(p.xy * 0.15 + 0.5);
       vec3 texCol = mix(
@@ -185,6 +190,9 @@ export function AmbientBackground({
   isActive = true,
   className = "",
 }: AmbientBackgroundProps) {
+  const musicShadersOn = useDisplaySettingsStore(
+    (s) => s.musicShaderEffectsEnabled ?? true
+  );
   const mountRef = useRef<HTMLDivElement>(null);
 
   const currentUrlRef = useRef<string | null>(null);
@@ -222,6 +230,7 @@ export function AmbientBackground({
   // ---------- react to cover URL changes ----------
 
   useEffect(() => {
+    if (!musicShadersOn) return;
     if (!coverUrl || coverUrl === currentUrlRef.current) return;
     currentUrlRef.current = coverUrl;
 
@@ -244,12 +253,12 @@ export function AmbientBackground({
         showingBRef.current = !showingBRef.current;
       })
       .catch(() => {});
-  }, [coverUrl, loadTexture]);
+  }, [coverUrl, loadTexture, musicShadersOn]);
 
   // ---------- Three.js setup & animation ----------
 
   useEffect(() => {
-    if (!isActive || !mountRef.current) return;
+    if (!isActive || !mountRef.current || !musicShadersOn) return;
 
     const el = mountRef.current;
     const scene = new THREE.Scene();
@@ -290,6 +299,7 @@ export function AmbientBackground({
           ),
         },
         time: { value: 0.0 },
+        audioBoost: { value: 0.0 },
         coverTextureA: { value: defaultTex },
         coverTextureB: { value: defaultTex },
         blendFactor: { value: 0.0 },
@@ -334,6 +344,11 @@ export function AmbientBackground({
       const deltaSeconds = lastRenderAt === 0 ? 0 : (now - lastRenderAt) / 1000;
       lastRenderAt = now;
       shaderMaterial.uniforms.time.value = now / 1000;
+      const { energy, beat } = useAudioReactiveStore.getState();
+      const motion = useAudioShaderSettingsStore.getState().visualMotion;
+      const e = Math.min(1, energy * motion);
+      const b = Math.min(1, beat * motion);
+      shaderMaterial.uniforms.audioBoost.value = Math.min(1.35, e * 1.05 + b * 0.55);
 
       const blend = blendRef.current;
       const step = deltaSeconds > 0 ? deltaSeconds / CROSSFADE_SECONDS : 0;
@@ -363,9 +378,25 @@ export function AmbientBackground({
       materialsRef.current = { material: null, textureA: null, textureB: null };
       renderer.dispose();
     };
-  }, [isActive, variant, loadTexture]);
+  }, [isActive, variant, loadTexture, musicShadersOn]);
 
   if (!isActive) return null;
+
+  if (!musicShadersOn) {
+    return (
+      <div
+        className={className}
+        style={{
+          width: "100%",
+          height: "100%",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          background: "linear-gradient(180deg, #080810 0%, #181820 100%)",
+        }}
+      />
+    );
+  }
 
   return (
     <div

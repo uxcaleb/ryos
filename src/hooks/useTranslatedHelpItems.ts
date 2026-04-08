@@ -165,6 +165,30 @@ const HELP_KEYS: Record<AppId, string[]> = {
     "search",
     "cloudLibrary",
   ],
+  "shader-settings": [
+    "desktopShader",
+    "beatReaction",
+    "fftSmoothing",
+    "visualMotion",
+    "lyricPulse",
+    "resetDefaults",
+  ],
+  "music-visualizer": [
+    "threeLooks",
+    "liveAudio",
+    "trackMood",
+    "worksWithKaraoke",
+    "fineTune",
+    "helpMenu",
+  ],
+  "visualizer-toggle": [
+    "oneTap",
+    "desktopWallpaper",
+    "ipodKaraoke",
+    "savedChoice",
+    "shaderSettingsMore",
+    "helpMenu",
+  ],
 };
 
 /**

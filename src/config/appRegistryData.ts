@@ -29,6 +29,9 @@ export const appIds = [
   "contacts",
   "dashboard",
   "candybar",
+  "shader-settings",
+  "music-visualizer",
+  "visualizer-toggle",
 ] as const;
 
 export type AppId = (typeof appIds)[number];
@@ -65,6 +68,9 @@ export const appNames: Record<AppId, string> = {
   "contacts": "Contacts",
   "dashboard": "Dashboard",
   "candybar": "CandyBar",
+  "shader-settings": "Shader Settings",
+  "music-visualizer": "Music Visualizer",
+  "visualizer-toggle": "Visualizer Switch",
 };
 
 /** Get list of apps with basic info for stores */

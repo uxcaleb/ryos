@@ -71,6 +71,12 @@ export enum DisplayMode {
   Mesh = "mesh",
   /** Show water/caustic shader over cover art */
   Water = "water",
+  /** Mood-colored neural web (live audio; palette from BPM/key/lyrics, not cover art) */
+  VisualizerNeural = "viz-neural",
+  /** Mood-colored metaballs (live audio) */
+  VisualizerBlobs = "viz-blobs",
+  /** Mood-colored swirl (live audio) */
+  VisualizerSwirl = "viz-swirl",
 }
 
 export enum KoreanDisplay {

@@ -111,6 +111,7 @@ const TimeMachineView: React.FC<TimeMachineViewProps> = ({
     [ShaderType.GALAXY]: t("apps.internet-explorer.galaxy"),
     [ShaderType.AURORA]: t("apps.internet-explorer.aurora"),
     [ShaderType.NEBULA]: t("apps.internet-explorer.nebula"),
+    [ShaderType.PINK_TRAIL_AURORA]: t("apps.internet-explorer.pinkTrailAurora"),
     off: t("apps.internet-explorer.off"),
   };
 

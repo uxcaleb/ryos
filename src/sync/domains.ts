@@ -451,6 +451,10 @@ function serializeSettingsSnapshot(): SettingsSnapshotData {
       displayMode: displayState.displayMode,
       shaderEffectEnabled: displayState.shaderEffectEnabled,
       selectedShaderType: displayState.selectedShaderType,
+      musicShaderEffectsEnabled: displayState.musicShaderEffectsEnabled ?? true,
+      desktopShaderTintHex: displayState.desktopShaderTintHex ?? "#ffffff",
+      desktopShaderTintMix: displayState.desktopShaderTintMix ?? 0,
+      desktopShaderSaturation: displayState.desktopShaderSaturation ?? 1,
       currentWallpaper: displayState.currentWallpaper,
       screenSaverEnabled: displayState.screenSaverEnabled,
       screenSaverType: displayState.screenSaverType,
@@ -886,6 +890,14 @@ async function applySettingsSnapshot(
           displayMode: normalizedData.display.displayMode as never,
           shaderEffectEnabled: normalizedData.display.shaderEffectEnabled,
           selectedShaderType: normalizedData.display.selectedShaderType as never,
+          musicShaderEffectsEnabled:
+            normalizedData.display.musicShaderEffectsEnabled ?? true,
+          desktopShaderTintHex:
+            normalizedData.display.desktopShaderTintHex ?? "#ffffff",
+          desktopShaderTintMix:
+            normalizedData.display.desktopShaderTintMix ?? 0,
+          desktopShaderSaturation:
+            normalizedData.display.desktopShaderSaturation ?? 1,
           screenSaverEnabled: normalizedData.display.screenSaverEnabled,
           screenSaverType: normalizedData.display.screenSaverType,
           screenSaverIdleTime: normalizedData.display.screenSaverIdleTime,

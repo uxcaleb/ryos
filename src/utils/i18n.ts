@@ -25,7 +25,10 @@ export type AppId =
   | "calendar"
   | "contacts"
   | "dashboard"
-  | "candybar";
+  | "candybar"
+  | "shader-settings"
+  | "music-visualizer"
+  | "visualizer-toggle";
 
 /**
  * Get translated app name with theme-awareness
@@ -156,6 +159,30 @@ export function getTranslatedHelpItems(appId: AppId): Array<{
     contacts: ["browseContacts", "createContacts", "editDetails", "importVCards", "useWithRyo", "cloudSync"],
     dashboard: ["openDashboard", "clockWidget", "calendarWidget", "weatherWidget", "moveWidgets", "closeDashboard"],
     candybar: ["browseIconPacks", "iconPackDetails", "applyIconPacks", "favorites", "search", "cloudLibrary"],
+    "shader-settings": [
+      "desktopShader",
+      "beatReaction",
+      "fftSmoothing",
+      "visualMotion",
+      "lyricPulse",
+      "resetDefaults",
+    ],
+    "music-visualizer": [
+      "threeLooks",
+      "liveAudio",
+      "trackMood",
+      "worksWithKaraoke",
+      "fineTune",
+      "helpMenu",
+    ],
+    "visualizer-toggle": [
+      "oneTap",
+      "desktopWallpaper",
+      "ipodKaraoke",
+      "savedChoice",
+      "shaderSettingsMore",
+      "helpMenu",
+    ],
   };
 
   const keys = helpKeys[appId] || [];

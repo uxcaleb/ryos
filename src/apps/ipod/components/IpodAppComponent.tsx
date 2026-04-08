@@ -28,6 +28,8 @@ import { AmbientBackground } from "@/components/shared/AmbientBackground";
 import { MeshGradientBackground } from "@/components/shared/MeshGradientBackground";
 import { WaterBackground } from "@/components/shared/WaterBackground";
 import { PLAYER_PROGRESS_INTERVAL_MS } from "../constants";
+import { usePlaybackAudioReactive } from "@/hooks/usePlaybackAudioReactive";
+import { IpodMoodShaderBlock } from "./IpodMoodShaderBlock";
 
 export function IpodAppComponent({
   isWindowOpen,
@@ -154,11 +156,23 @@ export function IpodAppComponent({
     getCurrentStoreTrack,
   } = useIpodLogic({ isWindowOpen, isForeground, initialData, instanceId });
 
+  usePlaybackAudioReactive({
+    url: tracks[currentIndex]?.url,
+    isPlaying,
+    isFullScreen,
+    windowPlayerRef: playerRef,
+    fullScreenPlayerRef,
+    ambientFallback: "breath",
+  });
+
   const displayModeOptions = [
     { value: DisplayMode.Video, label: t("apps.ipod.menu.displayVideo") },
     { value: DisplayMode.Mesh, label: t("apps.ipod.menu.displayGradient") },
     { value: DisplayMode.Water, label: t("apps.ipod.menu.displayWater") },
     { value: DisplayMode.Shader, label: t("apps.ipod.menu.displayShader") },
+    { value: DisplayMode.VisualizerNeural, label: t("apps.ipod.menu.displayVizNeural") },
+    { value: DisplayMode.VisualizerBlobs, label: t("apps.ipod.menu.displayVizBlobs") },
+    { value: DisplayMode.VisualizerSwirl, label: t("apps.ipod.menu.displayVizSwirl") },
     { value: DisplayMode.Landscapes, label: t("apps.ipod.menu.displayLandscapes") },
     { value: DisplayMode.Cover, label: t("apps.ipod.menu.displayCover") },
   ];
@@ -173,6 +187,9 @@ export function IpodAppComponent({
         [DisplayMode.Shader]: t("apps.ipod.menu.displayShader"),
         [DisplayMode.Mesh]: t("apps.ipod.menu.displayGradient"),
         [DisplayMode.Water]: t("apps.ipod.menu.displayWater"),
+        [DisplayMode.VisualizerNeural]: t("apps.ipod.menu.displayVizNeural"),
+        [DisplayMode.VisualizerBlobs]: t("apps.ipod.menu.displayVizBlobs"),
+        [DisplayMode.VisualizerSwirl]: t("apps.ipod.menu.displayVizSwirl"),
       };
       const label = labels[value] ?? value;
       showStatus(`${t("apps.ipod.menu.display", "Display")}: ${label}`);
@@ -572,6 +589,15 @@ export function IpodAppComponent({
                       className="fixed inset-0 z-[5]"
                     />
                   )}
+
+                  <IpodMoodShaderBlock
+                    displayMode={displayMode}
+                    currentTrack={tracks[currentIndex] ?? null}
+                    coverUrl={fullscreenCoverUrl}
+                    durationSec={totalTime}
+                    shouldAnimateVisuals={shouldAnimateFullScreenVisuals}
+                    className="fixed inset-0 z-[5]"
+                  />
 
                   {/* Cover overlay: shows when paused (any mode) or always in Cover mode */}
                   <AnimatePresence>

@@ -18,6 +18,10 @@ export interface SettingsSnapshotData {
     displayMode: string;
     shaderEffectEnabled: boolean;
     selectedShaderType: string;
+    musicShaderEffectsEnabled: boolean;
+    desktopShaderTintHex: string;
+    desktopShaderTintMix: number;
+    desktopShaderSaturation: number;
     currentWallpaper: string;
     screenSaverEnabled: boolean;
     screenSaverType: string;
@@ -96,8 +100,27 @@ export function normalizeSettingsSnapshotData(
       }
     : snapshot.ipod;
 
+  const displayDefaults = {
+    musicShaderEffectsEnabled: true,
+    desktopShaderTintHex: "#ffffff",
+    desktopShaderTintMix: 0,
+    desktopShaderSaturation: 1,
+  };
+
+  const d = snapshot.display ?? ({} as SettingsSnapshotData["display"]);
+
   return {
     ...snapshot,
+    display: {
+      ...displayDefaults,
+      ...d,
+      musicShaderEffectsEnabled:
+        d.musicShaderEffectsEnabled ?? displayDefaults.musicShaderEffectsEnabled,
+      desktopShaderTintHex: d.desktopShaderTintHex ?? displayDefaults.desktopShaderTintHex,
+      desktopShaderTintMix: d.desktopShaderTintMix ?? displayDefaults.desktopShaderTintMix,
+      desktopShaderSaturation:
+        d.desktopShaderSaturation ?? displayDefaults.desktopShaderSaturation,
+    },
     ipod: normalizedIpod,
     sectionUpdatedAt: normalizedSectionUpdatedAt,
   };

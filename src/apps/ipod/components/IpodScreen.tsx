@@ -23,6 +23,7 @@ import { LandscapeVideoBackground } from "@/components/shared/LandscapeVideoBack
 import { AmbientBackground } from "@/components/shared/AmbientBackground";
 import { MeshGradientBackground } from "@/components/shared/MeshGradientBackground";
 import { WaterBackground } from "@/components/shared/WaterBackground";
+import { IpodMoodShaderBlock } from "./IpodMoodShaderBlock";
 import type { IpodScreenProps } from "../types";
 
 // Animation variants for menu transitions
@@ -338,6 +339,15 @@ export function IpodScreen({
                 className="absolute inset-0 z-[5]"
               />
             )}
+
+            <IpodMoodShaderBlock
+              displayMode={displayMode}
+              currentTrack={currentTrack}
+              coverUrl={coverUrl}
+              durationSec={totalTime}
+              shouldAnimateVisuals={shouldAnimateVisuals}
+              className="absolute inset-0 z-[5]"
+            />
 
             {/* Dark overlay when lyrics are shown */}
             {showVideo && shouldShowLyrics && (

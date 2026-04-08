@@ -14,7 +14,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useLyrics } from "@/hooks/useLyrics";
 import { useFurigana } from "@/hooks/useFurigana";
 import { useActivityState, isAnyActivityActive } from "@/hooks/useActivityState";
-import { useLyricsErrorToast } from "@/hooks/useLyricsErrorToast";
 import { useKaraokeStore } from "@/stores/useKaraokeStore";
 import { getEffectiveTranslationLanguage, type Track } from "@/stores/useIpodStore";
 import { LyricsDisplay } from "@/apps/ipod/components/LyricsDisplay";
@@ -61,8 +60,6 @@ interface ProviderProps {
   lyricsTranslationLanguage: string | null;
   lyricsSourceOverride: Track["lyricsSource"];
   isAddingSong: boolean;
-  setIsLyricsSearchDialogOpen: (open: boolean) => void;
-  t: TFunction;
   auth?: { username: string; isAuthenticated: boolean };
   lyricsPlaybackSyncRef: MutableRefObject<
     ((timeInLyricsSeconds: number) => void) | null
@@ -77,8 +74,6 @@ export function KaraokeLyricsPlaybackProvider({
   lyricsTranslationLanguage,
   lyricsSourceOverride,
   isAddingSong,
-  setIsLyricsSearchDialogOpen,
-  t,
   auth,
   lyricsPlaybackSyncRef,
 }: ProviderProps) {
@@ -113,14 +108,6 @@ export function KaraokeLyricsPlaybackProvider({
     includeSoramimi: true,
     soramimiTargetLanguage: romanization.soramamiTargetLanguage ?? "zh-TW",
     auth,
-  });
-
-  useLyricsErrorToast({
-    error: lyricsControls.error,
-    songId: currentTrack?.id,
-    onSearchClick: () => setIsLyricsSearchDialogOpen(true),
-    t,
-    appId: "karaoke",
   });
 
   const {

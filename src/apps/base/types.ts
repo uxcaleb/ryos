@@ -44,7 +44,10 @@ export interface BaseApp<TInitialData = unknown> {
     | "calendar"
     | "contacts"
     | "dashboard"
-    | "candybar";
+    | "candybar"
+    | "shader-settings"
+    | "music-visualizer"
+    | "visualizer-toggle";
   name: string;
   icon: string | { type: "image"; src: string };
   description: string;
