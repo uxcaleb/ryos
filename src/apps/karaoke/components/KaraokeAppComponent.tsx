@@ -35,6 +35,7 @@ import { DisplayMode } from "@/types/lyrics";
 import { LandscapeVideoBackground } from "@/components/shared/LandscapeVideoBackground";
 import { AmbientBackground } from "@/components/shared/AmbientBackground";
 import { MeshGradientBackground } from "@/components/shared/MeshGradientBackground";
+import { MeshGradientOilBackground } from "@/components/shared/MeshGradientOilBackground";
 import { WaterBackground } from "@/components/shared/WaterBackground";
 import { PLAYER_PROGRESS_INTERVAL_MS } from "@/apps/ipod/constants";
 import { useChatsStore } from "@/stores/useChatsStore";
@@ -42,6 +43,7 @@ import { useShallow } from "zustand/react/shallow";
 import { usePlaybackAudioReactive } from "@/hooks/usePlaybackAudioReactive";
 import { KaraokeLyricAudioReactiveBridge } from "./KaraokeLyricAudioReactiveBridge";
 import { KaraokeMoodShaderBlock } from "./KaraokeMoodShaderBlock";
+import { KaraokeSvgOutlineRingBlock } from "./KaraokeSvgOutlineRingBlock";
 
 export function KaraokeAppComponent({
   isWindowOpen,
@@ -204,6 +206,7 @@ export function KaraokeAppComponent({
   const displayModeOptions = [
     { value: DisplayMode.Video, label: t("apps.ipod.menu.displayVideo") },
     { value: DisplayMode.Mesh, label: t("apps.ipod.menu.displayGradient") },
+    { value: DisplayMode.MeshOil, label: t("apps.ipod.menu.displayOil") },
     { value: DisplayMode.Water, label: t("apps.ipod.menu.displayWater") },
     { value: DisplayMode.Shader, label: t("apps.ipod.menu.displayShader") },
     { value: DisplayMode.VisualizerNeural, label: t("apps.ipod.menu.displayVizNeural") },
@@ -222,6 +225,7 @@ export function KaraokeAppComponent({
         [DisplayMode.Landscapes]: t("apps.ipod.menu.displayLandscapes"),
         [DisplayMode.Shader]: t("apps.ipod.menu.displayShader"),
         [DisplayMode.Mesh]: t("apps.ipod.menu.displayGradient"),
+        [DisplayMode.MeshOil]: t("apps.ipod.menu.displayOil"),
         [DisplayMode.Water]: t("apps.ipod.menu.displayWater"),
         [DisplayMode.VisualizerNeural]: t("apps.ipod.menu.displayVizNeural"),
         [DisplayMode.VisualizerBlobs]: t("apps.ipod.menu.displayVizBlobs"),
@@ -541,6 +545,15 @@ export function KaraokeAppComponent({
             />
           )}
 
+          {/* Mesh + oil strokes */}
+          {effectiveDisplayMode === DisplayMode.MeshOil && currentTrack && (
+            <MeshGradientOilBackground
+              coverUrl={coverUrl}
+              isActive={shouldAnimateVisuals}
+              className="absolute inset-0 z-[5]"
+            />
+          )}
+
           {/* Water shader background */}
           {effectiveDisplayMode === DisplayMode.Water && currentTrack && (
             <WaterBackground
@@ -551,6 +564,14 @@ export function KaraokeAppComponent({
           )}
 
           <KaraokeMoodShaderBlock
+            displayMode={effectiveDisplayMode}
+            currentTrack={currentTrack}
+            coverUrl={coverUrl}
+            duration={duration}
+            shouldAnimateVisuals={shouldAnimateVisuals}
+            className="absolute inset-0 z-[5]"
+          />
+          <KaraokeSvgOutlineRingBlock
             displayMode={effectiveDisplayMode}
             currentTrack={currentTrack}
             coverUrl={coverUrl}
@@ -980,6 +1001,15 @@ export function KaraokeAppComponent({
                   />
                 )}
 
+                {/* Mesh + oil strokes (fullscreen) */}
+                {effectiveDisplayMode === DisplayMode.MeshOil && currentTrack && (
+                  <MeshGradientOilBackground
+                    coverUrl={coverUrl}
+                    isActive={shouldAnimateVisuals}
+                    className="fixed inset-0 z-[5]"
+                  />
+                )}
+
                 {/* Water shader background (fullscreen) */}
                 {effectiveDisplayMode === DisplayMode.Water && currentTrack && (
                   <WaterBackground
@@ -990,6 +1020,14 @@ export function KaraokeAppComponent({
                 )}
 
                 <KaraokeMoodShaderBlock
+                  displayMode={effectiveDisplayMode}
+                  currentTrack={currentTrack}
+                  coverUrl={coverUrl}
+                  duration={duration}
+                  shouldAnimateVisuals={shouldAnimateVisuals}
+                  className="fixed inset-0 z-[5]"
+                />
+                <KaraokeSvgOutlineRingBlock
                   displayMode={effectiveDisplayMode}
                   currentTrack={currentTrack}
                   coverUrl={coverUrl}

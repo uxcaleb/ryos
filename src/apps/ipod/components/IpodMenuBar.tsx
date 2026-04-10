@@ -21,6 +21,7 @@ import { generateAppShareUrl } from "@/utils/sharedUrl";
 import { LyricsAlignment, DisplayMode } from "@/types/lyrics";
 import { useThemeStore } from "@/stores/useThemeStore";
 import { ShareItemDialog } from "@/components/dialogs/ShareItemDialog";
+import { SvgOutlineManagerDialog } from "@/components/dialogs/SvgOutlineManagerDialog";
 import { appRegistry } from "@/config/appRegistry";
 import { useTranslation } from "react-i18next";
 
@@ -51,6 +52,7 @@ export function IpodMenuBar({
 }: IpodMenuBarProps) {
   const { t } = useTranslation();
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [svgOutlineManagerOpen, setSvgOutlineManagerOpen] = useState(false);
   const appId = "ipod";
   const appName = appRegistry[appId as keyof typeof appRegistry]?.name || appId;
 
@@ -536,6 +538,15 @@ export function IpodMenuBar({
                 {t("apps.ipod.menu.displayGradient")}
               </MenubarCheckboxItem>
               <MenubarCheckboxItem
+                checked={displayMode === DisplayMode.MeshOil}
+                onCheckedChange={(checked) => {
+                  if (checked) setDisplayMode(DisplayMode.MeshOil);
+                }}
+                className="text-md h-6 pr-3"
+              >
+                {t("apps.ipod.menu.displayOil")}
+              </MenubarCheckboxItem>
+              <MenubarCheckboxItem
                 checked={displayMode === DisplayMode.Water}
                 onCheckedChange={(checked) => {
                   if (checked) setDisplayMode(DisplayMode.Water);
@@ -580,6 +591,13 @@ export function IpodMenuBar({
               >
                 {t("apps.ipod.menu.displayVizSwirl")}
               </MenubarCheckboxItem>
+              <MenubarSeparator className="h-[2px] bg-black my-1" />
+              <MenubarItem
+                className="text-md h-6 px-3"
+                onClick={() => setSvgOutlineManagerOpen(true)}
+              >
+                {t("apps.ipod.menu.svgOutlineManager")}
+              </MenubarItem>
               <MenubarCheckboxItem
                 checked={displayMode === DisplayMode.Landscapes}
                 onCheckedChange={(checked) => {
@@ -830,6 +848,11 @@ export function IpodMenuBar({
         itemIdentifier={appId}
         title={appName}
         generateShareUrl={generateAppShareUrl}
+      />
+      <SvgOutlineManagerDialog
+        open={svgOutlineManagerOpen}
+        onOpenChange={setSvgOutlineManagerOpen}
+        onRequestRingDisplayMode={() => setDisplayMode(DisplayMode.Mesh)}
       />
     </MenuBar>
   );

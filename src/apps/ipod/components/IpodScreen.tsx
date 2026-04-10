@@ -22,8 +22,10 @@ import { DisplayMode } from "@/types/lyrics";
 import { LandscapeVideoBackground } from "@/components/shared/LandscapeVideoBackground";
 import { AmbientBackground } from "@/components/shared/AmbientBackground";
 import { MeshGradientBackground } from "@/components/shared/MeshGradientBackground";
+import { MeshGradientOilBackground } from "@/components/shared/MeshGradientOilBackground";
 import { WaterBackground } from "@/components/shared/WaterBackground";
 import { IpodMoodShaderBlock } from "./IpodMoodShaderBlock";
+import { IpodSvgOutlineRingBlock } from "./IpodSvgOutlineRingBlock";
 import type { IpodScreenProps } from "../types";
 
 // Animation variants for menu transitions
@@ -54,6 +56,7 @@ export function IpodScreen({
   menuDirection,
   onMenuItemAction,
   showVideo,
+  youtubeIframeMuted = false,
   displayMode,
   playerRef,
   handleTrackEnd,
@@ -270,6 +273,7 @@ export function IpodScreen({
                 ref={playerRef}
                 url={currentTrack.url}
                 playing={isPlaying}
+                muted={youtubeIframeMuted}
                 controls={showVideo && displayMode === DisplayMode.Video}
                 width="100%"
                 height="100%"
@@ -331,6 +335,15 @@ export function IpodScreen({
               />
             )}
 
+            {/* Mesh gradient + oil-paint stroke overlay */}
+            {displayMode === DisplayMode.MeshOil && (
+              <MeshGradientOilBackground
+                coverUrl={coverUrl}
+                isActive={shouldAnimateVisuals}
+                className="absolute inset-0 z-[5]"
+              />
+            )}
+
             {/* Water shader background */}
             {displayMode === DisplayMode.Water && (
               <WaterBackground
@@ -341,6 +354,14 @@ export function IpodScreen({
             )}
 
             <IpodMoodShaderBlock
+              displayMode={displayMode}
+              currentTrack={currentTrack}
+              coverUrl={coverUrl}
+              durationSec={totalTime}
+              shouldAnimateVisuals={shouldAnimateVisuals}
+              className="absolute inset-0 z-[5]"
+            />
+            <IpodSvgOutlineRingBlock
               displayMode={displayMode}
               currentTrack={currentTrack}
               coverUrl={coverUrl}

@@ -1,18 +1,19 @@
 import { useEffect, useMemo, useRef } from "react";
-import { useKaraokeStore } from "@/stores/useKaraokeStore";
+import { useIpodStore } from "@/stores/useIpodStore";
 import { useAudioReactiveStore } from "@/stores/useAudioReactiveStore";
 import { useAudioShaderSettingsStore } from "@/stores/useAudioShaderSettingsStore";
 import { flattenLyricEvents } from "@/utils/lyricVisualizationEvents";
-import { useKaraokeLyricsPlayback } from "./KaraokeLyricsPlayback";
 
 /**
  * When YouTube iframe playback prevents FFT analysis, drive `useAudioReactiveStore` from
- * lyric line / word onset times so visuals still pulse with the vocal.
+ * iPod lyric line / word onsets so the neural / mood shaders still pulse with the vocal.
  */
-export function KaraokeLyricAudioReactiveBridge() {
-  const { lyricsControls } = useKaraokeLyricsPlayback();
-  const lines = lyricsControls.originalLines;
-  const events = useMemo(() => flattenLyricEvents(lines), [lines]);
+export function IpodLyricAudioReactiveBridge() {
+  const lines = useIpodStore((s) => s.currentLyrics?.lines);
+  const events = useMemo(
+    () => (lines?.length ? flattenLyricEvents(lines) : []),
+    [lines],
+  );
   const smoothingRef = useRef(0);
   const beatRef = useRef(0);
   const lastEmitRef = useRef(0);
@@ -32,7 +33,17 @@ export function KaraokeLyricAudioReactiveBridge() {
         return;
       }
 
-      const tMs = useKaraokeStore.getState().elapsedTime * 1000;
+      if (events.length === 0) {
+        return;
+      }
+
+      const s = useIpodStore.getState();
+      if (!s.isPlaying) return;
+
+      const track = s.tracks.find((t) => t.id === s.currentSongId) ?? s.tracks[0];
+      const offsetMs = track?.lyricOffset ?? 0;
+      const tMs = s.elapsedTime * 1000 + offsetMs;
+
       let hit = 0;
       for (const e of events) {
         const d = Math.abs(tMs - e);
@@ -51,7 +62,7 @@ export function KaraokeLyricAudioReactiveBridge() {
       const lyricPulse = useAudioShaderSettingsStore.getState().lyricPulse;
       beatRef.current = Math.min(
         1,
-        beatRef.current + (spike * 1.1 + (hit > 0.88 ? 0.4 : 0)) * lyricPulse
+        beatRef.current + (spike * 1.1 + (hit > 0.88 ? 0.4 : 0)) * lyricPulse,
       );
 
       const now = performance.now();

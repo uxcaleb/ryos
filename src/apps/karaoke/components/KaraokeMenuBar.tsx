@@ -16,6 +16,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useThemeStore } from "@/stores/useThemeStore";
 import { ShareItemDialog } from "@/components/dialogs/ShareItemDialog";
+import { SvgOutlineManagerDialog } from "@/components/dialogs/SvgOutlineManagerDialog";
 import { generateAppShareUrl } from "@/utils/sharedUrl";
 import { useIpodStoreShallow } from "@/stores/helpers";
 import { useDisplaySettingsStore } from "@/stores/useDisplaySettingsStore";
@@ -101,6 +102,7 @@ export function KaraokeMenuBar({
 }: KaraokeMenuBarProps) {
   const { t } = useTranslation();
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [svgOutlineManagerOpen, setSvgOutlineManagerOpen] = useState(false);
   const appId = "karaoke";
   const appName = t("apps.karaoke.name");
 
@@ -603,6 +605,15 @@ export function KaraokeMenuBar({
                 {t("apps.ipod.menu.displayGradient")}
               </MenubarCheckboxItem>
               <MenubarCheckboxItem
+                checked={displayMode === DisplayMode.MeshOil}
+                onCheckedChange={(checked) => {
+                  if (checked) setDisplayMode(DisplayMode.MeshOil);
+                }}
+                className="text-md h-6 pr-3"
+              >
+                {t("apps.ipod.menu.displayOil")}
+              </MenubarCheckboxItem>
+              <MenubarCheckboxItem
                 checked={displayMode === DisplayMode.Water}
                 onCheckedChange={(checked) => {
                   if (checked) setDisplayMode(DisplayMode.Water);
@@ -647,6 +658,13 @@ export function KaraokeMenuBar({
               >
                 {t("apps.ipod.menu.displayVizSwirl")}
               </MenubarCheckboxItem>
+              <MenubarSeparator className="h-[2px] bg-black my-1" />
+              <MenubarItem
+                className="text-md h-6 px-3"
+                onClick={() => setSvgOutlineManagerOpen(true)}
+              >
+                {t("apps.ipod.menu.svgOutlineManager")}
+              </MenubarItem>
               <MenubarCheckboxItem
                 checked={displayMode === DisplayMode.Landscapes}
                 onCheckedChange={(checked) => {
@@ -842,6 +860,11 @@ export function KaraokeMenuBar({
         itemIdentifier={appId}
         title={appName}
         generateShareUrl={generateAppShareUrl}
+      />
+      <SvgOutlineManagerDialog
+        open={svgOutlineManagerOpen}
+        onOpenChange={setSvgOutlineManagerOpen}
+        onRequestRingDisplayMode={() => setDisplayMode(DisplayMode.Mesh)}
       />
     </MenuBar>
   );

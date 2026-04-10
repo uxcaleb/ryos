@@ -22,14 +22,18 @@ import { getTranslatedAppName } from "@/utils/i18n";
 import { useAudioSettingsStore } from "@/stores/useAudioSettingsStore";
 import { useIpodLogic } from "../hooks/useIpodLogic";
 import { DisplayMode } from "@/types/lyrics";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { LandscapeVideoBackground } from "@/components/shared/LandscapeVideoBackground";
 import { AmbientBackground } from "@/components/shared/AmbientBackground";
 import { MeshGradientBackground } from "@/components/shared/MeshGradientBackground";
+import { MeshGradientOilBackground } from "@/components/shared/MeshGradientOilBackground";
 import { WaterBackground } from "@/components/shared/WaterBackground";
 import { PLAYER_PROGRESS_INTERVAL_MS } from "../constants";
 import { usePlaybackAudioReactive } from "@/hooks/usePlaybackAudioReactive";
+import { useYoutubeHtml5AnalysisAudio } from "@/hooks/useYoutubeHtml5AnalysisAudio";
+import { IpodLyricAudioReactiveBridge } from "./IpodLyricAudioReactiveBridge";
 import { IpodMoodShaderBlock } from "./IpodMoodShaderBlock";
+import { IpodSvgOutlineRingBlock } from "./IpodSvgOutlineRingBlock";
 
 export function IpodAppComponent({
   isWindowOpen,
@@ -156,6 +160,23 @@ export function IpodAppComponent({
     getCurrentStoreTrack,
   } = useIpodLogic({ isWindowOpen, isForeground, initialData, instanceId });
 
+  const masterVolume = useAudioSettingsStore((s) => s.masterVolume);
+  const effectiveVolume = ipodVolume * masterVolume;
+  const volumeRef = useRef(effectiveVolume);
+  volumeRef.current = effectiveVolume;
+  const getPlaybackVolume = useCallback(() => volumeRef.current, []);
+
+  const getCurrentTimeSeconds = useCallback(() => {
+    const p = isFullScreen ? fullScreenPlayerRef.current : playerRef.current;
+    return p?.getCurrentTime?.() ?? null;
+  }, [isFullScreen]);
+
+  const youtubeAnalysisAudio = useYoutubeHtml5AnalysisAudio({
+    trackUrl: tracks[currentIndex]?.url,
+    isPlaying,
+    getCurrentTimeSeconds,
+  });
+
   usePlaybackAudioReactive({
     url: tracks[currentIndex]?.url,
     isPlaying,
@@ -163,11 +184,14 @@ export function IpodAppComponent({
     windowPlayerRef: playerRef,
     fullScreenPlayerRef,
     ambientFallback: "breath",
+    analysisMediaRef: youtubeAnalysisAudio.analysisMediaRef,
+    getPlaybackVolume,
   });
 
   const displayModeOptions = [
     { value: DisplayMode.Video, label: t("apps.ipod.menu.displayVideo") },
     { value: DisplayMode.Mesh, label: t("apps.ipod.menu.displayGradient") },
+    { value: DisplayMode.MeshOil, label: t("apps.ipod.menu.displayOil") },
     { value: DisplayMode.Water, label: t("apps.ipod.menu.displayWater") },
     { value: DisplayMode.Shader, label: t("apps.ipod.menu.displayShader") },
     { value: DisplayMode.VisualizerNeural, label: t("apps.ipod.menu.displayVizNeural") },
@@ -186,6 +210,7 @@ export function IpodAppComponent({
         [DisplayMode.Landscapes]: t("apps.ipod.menu.displayLandscapes"),
         [DisplayMode.Shader]: t("apps.ipod.menu.displayShader"),
         [DisplayMode.Mesh]: t("apps.ipod.menu.displayGradient"),
+        [DisplayMode.MeshOil]: t("apps.ipod.menu.displayOil"),
         [DisplayMode.Water]: t("apps.ipod.menu.displayWater"),
         [DisplayMode.VisualizerNeural]: t("apps.ipod.menu.displayVizNeural"),
         [DisplayMode.VisualizerBlobs]: t("apps.ipod.menu.displayVizBlobs"),
@@ -217,6 +242,7 @@ export function IpodAppComponent({
 
   return (
     <>
+      <IpodLyricAudioReactiveBridge />
       {!isXpTheme && isForeground && menuBar}
       <WindowFrame
         title={getTranslatedAppName("ipod")}
@@ -335,6 +361,7 @@ export function IpodAppComponent({
             >
               <IpodScreen
                 currentTrack={tracks[currentIndex] || null}
+                youtubeIframeMuted={youtubeAnalysisAudio.youtubeIframeMuted}
                 isPlaying={isPlaying && !isFullScreen}
                 elapsedTime={elapsedTime}
                 totalTime={totalTime}
@@ -518,6 +545,7 @@ export function IpodAppComponent({
                             ref={fullScreenPlayerRef}
                             url={tracks[currentIndex].url}
                             playing={isPlaying && isFullScreen}
+                            muted={youtubeAnalysisAudio.youtubeIframeMuted}
                             controls
                             width="100%"
                             height="100%"
@@ -581,6 +609,15 @@ export function IpodAppComponent({
                     />
                   )}
 
+                  {/* Mesh + oil strokes (fullscreen) */}
+                  {displayMode === DisplayMode.MeshOil && tracks[currentIndex] && (
+                    <MeshGradientOilBackground
+                      coverUrl={fullscreenCoverUrl}
+                      isActive={shouldAnimateFullScreenVisuals}
+                      className="fixed inset-0 z-[5]"
+                    />
+                  )}
+
                   {/* Water shader background (fullscreen) */}
                   {displayMode === DisplayMode.Water && tracks[currentIndex] && (
                     <WaterBackground
@@ -591,6 +628,14 @@ export function IpodAppComponent({
                   )}
 
                   <IpodMoodShaderBlock
+                    displayMode={displayMode}
+                    currentTrack={tracks[currentIndex] ?? null}
+                    coverUrl={fullscreenCoverUrl}
+                    durationSec={totalTime}
+                    shouldAnimateVisuals={shouldAnimateFullScreenVisuals}
+                    className="fixed inset-0 z-[5]"
+                  />
+                  <IpodSvgOutlineRingBlock
                     displayMode={displayMode}
                     currentTrack={tracks[currentIndex] ?? null}
                     coverUrl={fullscreenCoverUrl}

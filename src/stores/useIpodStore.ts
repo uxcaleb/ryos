@@ -16,6 +16,7 @@ import { getAppPublicOrigin } from "@/utils/runtimeConfig";
 import { getCachedSongMetadata, listAllCachedSongMetadata } from "@/utils/songMetadataCache";
 import i18n from "@/lib/i18n";
 import { useChatsStore } from "./useChatsStore";
+import { useMusicVisualizerAppStore } from "./useMusicVisualizerAppStore";
 import { abortableFetch } from "@/utils/abortableFetch";
 import { emitCloudSyncDomainChange } from "@/utils/cloudSyncEvents";
 import { sortTracksLikeServerOrder } from "@/stores/ipodTrackOrder";
@@ -642,7 +643,12 @@ export const useIpodStore = create<IpodState>()(
         }
         set((state) => ({ showVideo: !state.showVideo }));
       },
-      setDisplayMode: (mode) => set({ displayMode: mode }),
+      setDisplayMode: (mode) => {
+        set({ displayMode: mode });
+        if (mode === DisplayMode.Mesh || mode === DisplayMode.MeshOil) {
+          useMusicVisualizerAppStore.getState().setMode(DisplayMode.VisualizerNeural);
+        }
+      },
       toggleBacklight: () =>
         set((state) => ({ backlightOn: !state.backlightOn })),
       toggleLcdFilter: () =>
@@ -1549,6 +1555,10 @@ export const useIpodStore = create<IpodState>()(
         if (state.displayMode === "liquid") {
           state.displayMode = "water";
         }
+        // Ring-outline-only mode removed; mesh gradient includes the ring overlay.
+        if (state.displayMode === "viz-svg-ring") {
+          state.displayMode = "mesh";
+        }
 
         // If the persisted version is older than the current version, update defaults
         if (version < CURRENT_IPOD_STORE_VERSION) {
@@ -1649,6 +1659,16 @@ export const useIpodStore = create<IpodState>()(
             Promise.resolve(state.initializeLibrary()).catch((err) =>
               console.error("Initialization failed on rehydrate", err)
             );
+          }
+          if (!error) {
+            queueMicrotask(() => {
+              const dm = useIpodStore.getState().displayMode;
+              if (dm === DisplayMode.Mesh || dm === DisplayMode.MeshOil) {
+                useMusicVisualizerAppStore
+                  .getState()
+                  .setMode(DisplayMode.VisualizerNeural);
+              }
+            });
           }
         };
       },

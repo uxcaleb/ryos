@@ -26,6 +26,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useDisplaySettingsStore } from "@/stores/useDisplaySettingsStore";
 import { formatKugouImageUrl, getYouTubeVideoId } from "@/apps/ipod/constants";
+import { useSyncMusicVisualizerWithIpodGradient } from "@/hooks/useSyncMusicVisualizerWithIpodGradient";
 
 export function MusicVisualizerAppComponent({
   isWindowOpen,
@@ -46,6 +47,7 @@ export function MusicVisualizerAppComponent({
 
   const mode = useMusicVisualizerAppStore((s) => s.mode);
   const setMode = useMusicVisualizerAppStore((s) => s.setMode);
+  useSyncMusicVisualizerWithIpodGradient();
   const musicShadersOn = useDisplaySettingsStore(
     (s) => s.musicShaderEffectsEnabled ?? true
   );

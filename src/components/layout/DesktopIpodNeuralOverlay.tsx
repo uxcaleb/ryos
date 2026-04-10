@@ -1,12 +1,15 @@
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { MoodShaderVisualizer } from "@/components/shared/MoodShaderVisualizer";
+import { MeshGradientBackground } from "@/components/shared/MeshGradientBackground";
+import { MeshGradientOilBackground } from "@/components/shared/MeshGradientOilBackground";
+import { IpodSvgOutlineRingBlock } from "@/apps/ipod/components/IpodSvgOutlineRingBlock";
 import { useTrackMoodProfile } from "@/hooks/useTrackMoodProfile";
 import { useIpodStore } from "@/stores/useIpodStore";
 import { useAppStore } from "@/stores/useAppStore";
 import { useDisplaySettingsStore } from "@/stores/useDisplaySettingsStore";
 import { formatKugouImageUrl, getYouTubeVideoId } from "@/apps/ipod/constants";
-import { DisplayMode } from "@/types/lyrics";
+import { DisplayMode, isMeshLikeDisplayMode } from "@/types/lyrics";
 import {
   mostVividHexFromPalette,
   useCoverPaletteForNeural,
@@ -18,9 +21,9 @@ const PLAYBACK_FADE_SEC = 0.48;
 const LINGER_AFTER_PAUSE_MS = Math.round(PLAYBACK_FADE_SEC * 1000) + 80;
 
 /** Cover hue wash (`mix-blend-color`) — lower = more wallpaper visible. */
-const DESKTOP_NEURAL_WASH_OPACITY = 0.24;
+const DESKTOP_NEURAL_WASH_OPACITY = 0.17;
 /** Neural layer composite strength — lower = background shines through more. */
-const DESKTOP_NEURAL_SHADER_LAYER_OPACITY = 0.62;
+const DESKTOP_NEURAL_SHADER_LAYER_OPACITY = 0.74;
 
 /** Pull vivid cover/mood color toward white for a softer cast (used with hue-style blend modes). */
 function blendHexTowardWhite(hex: string, t: number): string {
@@ -33,12 +36,28 @@ function blendHexTowardWhite(hex: string, t: number): string {
   return `rgb(${r},${g},${b})`;
 }
 
+function isIpodVisualizerMode(
+  m: DisplayMode,
+): m is
+  | DisplayMode.VisualizerNeural
+  | DisplayMode.VisualizerBlobs
+  | DisplayMode.VisualizerSwirl {
+  return (
+    m === DisplayMode.VisualizerNeural ||
+    m === DisplayMode.VisualizerBlobs ||
+    m === DisplayMode.VisualizerSwirl
+  );
+}
+
 /**
- * Full-screen neural mood shader over the desktop wallpaper while iPod audio is playing.
+ * Full-screen visual over the desktop wallpaper while iPod audio is playing.
+ * Display → Gradient / Gradient (oil): mesh background plus a light mono SVG ring ({@link IpodSvgOutlineRingBlock}).
+ * Other modes use {@link MoodShaderVisualizer} only (no standalone ring display).
  * Sits above video/static wallpaper, below desktop icons (pointer-events: none).
  */
 export function DesktopIpodNeuralOverlay() {
   const exposeMode = useAppStore((s) => s.exposeMode);
+  const displayMode = useIpodStore((s) => s.displayMode);
   const isPlaying = useIpodStore((s) => s.isPlaying);
   const currentSongId = useIpodStore((s) => s.currentSongId);
   const tracks = useIpodStore((s) => s.tracks);
@@ -84,6 +103,14 @@ export function DesktopIpodNeuralOverlay() {
 
   const washColorLerped = useLerpedCssColor(washColorBlend);
 
+  /** Match iPod’s visualizer style; Mesh uses the same mesh gradient as the iPod screen (not neural). */
+  const moodShaderMode = isIpodVisualizerMode(displayMode)
+    ? displayMode
+    : DisplayMode.VisualizerNeural;
+
+  const showMeshLike = isMeshLikeDisplayMode(displayMode);
+  const showMeshOil = displayMode === DisplayMode.MeshOil;
+
   const eligible =
     !exposeMode && musicShadersOn && track != null;
 
@@ -120,27 +147,60 @@ export function DesktopIpodNeuralOverlay() {
       }}
       aria-hidden
     >
-      <div
-        className="absolute inset-0 mix-blend-color"
-        style={{
-          backgroundColor: washColorLerped,
-          opacity: DESKTOP_NEURAL_WASH_OPACITY,
-        }}
-        aria-hidden
-      />
-      <div
-        className="absolute inset-0 mix-blend-soft-light"
-        style={{ opacity: DESKTOP_NEURAL_SHADER_LAYER_OPACITY }}
-        aria-hidden
-      >
-        <MoodShaderVisualizer
-          mode={DisplayMode.VisualizerNeural}
-          mood={mood}
-          isActive={isPlaying || lingerAfterPause}
-          coverUrl={coverUrl}
-          className="h-full w-full"
-        />
-      </div>
+      {showMeshLike ? (
+        <>
+          <div className="absolute inset-0" aria-hidden>
+            {showMeshOil ? (
+              <MeshGradientOilBackground
+                coverUrl={coverUrl}
+                isActive={isPlaying || lingerAfterPause}
+                className="h-full w-full"
+              />
+            ) : (
+              <MeshGradientBackground
+                coverUrl={coverUrl}
+                isActive={isPlaying || lingerAfterPause}
+                className="h-full w-full"
+              />
+            )}
+          </div>
+          <div className="absolute inset-0 z-[1]" aria-hidden>
+            <IpodSvgOutlineRingBlock
+              displayMode={displayMode}
+              currentTrack={track}
+              coverUrl={coverUrl}
+              durationSec={totalTime > 0 ? totalTime : 0}
+              shouldAnimateVisuals={isPlaying || lingerAfterPause}
+              className="h-full w-full"
+              appearance="lightMono"
+            />
+          </div>
+        </>
+      ) : (
+        <>
+          <div
+            className="absolute inset-0 mix-blend-color"
+            style={{
+              backgroundColor: washColorLerped,
+              opacity: DESKTOP_NEURAL_WASH_OPACITY,
+            }}
+            aria-hidden
+          />
+          <div
+            className="absolute inset-0 mix-blend-soft-light"
+            style={{ opacity: DESKTOP_NEURAL_SHADER_LAYER_OPACITY }}
+            aria-hidden
+          >
+            <MoodShaderVisualizer
+              mode={moodShaderMode}
+              mood={mood}
+              isActive={isPlaying || lingerAfterPause}
+              coverUrl={coverUrl}
+              className="h-full w-full"
+            />
+          </div>
+        </>
+      )}
     </motion.div>
   );
 }

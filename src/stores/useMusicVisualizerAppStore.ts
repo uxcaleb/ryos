@@ -37,6 +37,22 @@ export const useMusicVisualizerAppStore = create<MusicVisualizerAppState>()(
         if (!merged.mode || !valid.has(merged.mode)) {
           merged.mode = DisplayMode.VisualizerNeural;
         }
+        try {
+          if (typeof localStorage !== "undefined") {
+            const raw = localStorage.getItem("ryos:ipod");
+            if (raw) {
+              const parsed = JSON.parse(raw) as {
+                state?: { displayMode?: string };
+              };
+              const dm = parsed.state?.displayMode;
+              if (dm === DisplayMode.Mesh || dm === DisplayMode.MeshOil) {
+                merged.mode = DisplayMode.VisualizerNeural;
+              }
+            }
+          }
+        } catch {
+          /* ignore corrupt storage */
+        }
         return merged;
       },
     }

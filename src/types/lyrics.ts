@@ -69,6 +69,8 @@ export enum DisplayMode {
   Shader = "shader",
   /** Show mesh gradient shader backdrop */
   Mesh = "mesh",
+  /** Same mesh gradient with an oil-paint stroke overlay */
+  MeshOil = "mesh-oil",
   /** Show water/caustic shader over cover art */
   Water = "water",
   /** Mood-colored neural web (live audio; palette from BPM/key/lyrics, not cover art) */
@@ -77,6 +79,11 @@ export enum DisplayMode {
   VisualizerBlobs = "viz-blobs",
   /** Mood-colored swirl (live audio) */
   VisualizerSwirl = "viz-swirl",
+}
+
+/** Gradient / oil displays that use the mesh background + optional SVG ring overlay. */
+export function isMeshLikeDisplayMode(m: DisplayMode): boolean {
+  return m === DisplayMode.Mesh || m === DisplayMode.MeshOil;
 }
 
 export enum KoreanDisplay {

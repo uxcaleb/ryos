@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { useSyncMusicVisualizerWithIpodGradient } from "@/hooks/useSyncMusicVisualizerWithIpodGradient";
 
 function SettingSlider({
   labelKey,
@@ -153,6 +154,7 @@ export function ShaderSettingsAppComponent({
 
   const musicVisualizerMode = useMusicVisualizerAppStore((s) => s.mode);
   const setMusicVisualizerMode = useMusicVisualizerAppStore((s) => s.setMode);
+  useSyncMusicVisualizerWithIpodGradient();
   const launchApp = useAppStore((s) => s.launchApp);
 
   const shaderTypeValues = useMemo(

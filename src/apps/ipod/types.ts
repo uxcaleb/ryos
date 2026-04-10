@@ -95,6 +95,8 @@ export interface IpodScreenProps {
   menuDirection: "forward" | "backward";
   onMenuItemAction: (action: () => void) => void;
   showVideo: boolean;
+  /** When using same-origin HTML5 audio tap for YouTube, mute the iframe player to avoid double audio. */
+  youtubeIframeMuted?: boolean;
   displayMode: DisplayMode;
   playerRef: React.RefObject<ReactPlayer | null>;
   handleTrackEnd: () => void;

@@ -26,10 +26,13 @@ interface MoodShaderVisualizerProps {
   className?: string;
 }
 
-/** Base zoom for neural field; audio adds a small sway plus a beat bump (waves still mostly from `speed`). */
-const NEURAL_VIEW_SCALE = 0.74;
-const NEURAL_SCALE_MIN = 0.698;
-const NEURAL_SCALE_MAX = 0.882;
+/**
+ * Neural field: higher `scale` = finer ripple detail (Paper Shaders pattern UV).
+ * Audio widens the range so kicks visibly “punch” the wave lattice.
+ */
+const NEURAL_VIEW_SCALE = 0.88;
+const NEURAL_SCALE_MIN = 0.72;
+const NEURAL_SCALE_MAX = 1.22;
 
 /**
  * Mood shaders: palettes from {@link computeTrackMood}, with optional cover-derived tints for the neural look.
@@ -82,18 +85,19 @@ export function MoodShaderVisualizer({
 
   const punch = beat;
   /** Snappier emphasis on downbeats (strong hits pop more than soft tails). */
-  const beatAccent = Math.min(1, punch * 1.2 + punch * punch * 0.55);
+  const beatAccent = Math.min(1, punch * 1.35 + punch * punch * 0.62);
   const react = energy * 0.72 + bass * 0.34 + beat * 0.62;
 
   if (mode === DisplayMode.VisualizerNeural) {
+    // Shader: noise = (1 + brightness) * noise², then pow(noise, .7 + 6 * contrast) — lift both for a bright Apple-style field with readable ridges.
     const waveSpeed = Math.min(
-      4.25,
-      0.45 +
-        energy * 0.68 +
-        bass * 1.12 +
-        mid * 0.48 +
-        treble * 0.42 +
-        beatAccent * 1.55
+      12,
+      1.05 +
+        energy * 1.35 +
+        bass * 1.75 +
+        mid * 1.05 +
+        treble * 0.82 +
+        beatAccent * 3.1
     );
 
     const neuralScale = Math.min(
@@ -101,11 +105,30 @@ export function MoodShaderVisualizer({
       Math.max(
         NEURAL_SCALE_MIN,
         NEURAL_VIEW_SCALE +
-          bass * 0.036 +
-          energy * 0.024 +
-          mid * 0.016 +
-          beatAccent * 0.078
+          bass * 0.095 +
+          energy * 0.055 +
+          mid * 0.038 +
+          treble * 0.028 +
+          beatAccent * 0.14
       )
+    );
+
+    const brightness = Math.min(
+      0.62,
+      0.3 +
+        energy * 0.42 +
+        treble * 0.24 +
+        mid * 0.12 +
+        bass * 0.1 +
+        beatAccent * 0.52
+    );
+    const contrast = Math.min(
+      0.92,
+      0.38 +
+        mid * 0.58 +
+        bass * 0.38 +
+        treble * 0.2 +
+        beatAccent * 0.42
     );
 
     return (
@@ -120,11 +143,14 @@ export function MoodShaderVisualizer({
             colorFront={pRender.colorFront}
             colorMid={pRender.colorMid}
             colorBack={pRender.colorBack}
-            brightness={0.09 + energy * 0.34 + treble * 0.14 + beatAccent * 0.42}
-            contrast={0.2 + mid * 0.48 + bass * 0.24 + treble * 0.12 + beatAccent * 0.24}
+            brightness={brightness}
+            contrast={contrast}
             speed={waveSpeed}
             scale={neuralScale}
-            rotation={0}
+            rotation={bass * 16 + beatAccent * 38 + mid * 9 + treble * 5}
+            offsetX={bass * 0.045 - treble * 0.022}
+            offsetY={beatAccent * 0.052 - mid * 0.028}
+            minPixelRatio={2}
           />
         </div>
         <DiscoBallOverlay />
